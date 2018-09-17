@@ -1,0 +1,45 @@
+{% extends "searchit/_layouts/main" %}
+{% import "_includes/forms" as forms %}
+
+{% block content %}
+
+    {# <h2>{{ "General Settings"|t('searchit') }}</h2> #}
+
+ 	<form action="" method="post" accept-charset="UTF-8">
+
+        <input type="hidden" name="action" value="plugins/save-plugin-settings">
+		<input type="hidden" name="pluginHandle" value="searchit">
+        {{ redirectInput('searchit/settings/general') }}
+        {{ csrfInput() }}
+
+        {% namespace 'settings' %}
+
+	        {{ forms.textField({
+	            label: 'Plugin Name'|t('searchit'),
+	            instructions: 'Override the plugin name for this install'|t('searchit'),
+	            id: 'pluginNameOverride',
+	            name: 'pluginNameOverride',
+	            placeholder: 'Searchit'|t('searchit'),
+	            value: settings.pluginNameOverride,
+	            errors: settings.getErrors('pluginNameOverride'),
+	            first: true
+	        }) }}
+
+	     	{{ forms.lightswitchField({
+	            label: 'Show in CP Nav'|t('searchit'),
+	            instructions: 'Display a link to this plugin in the main cp navigation'|t('searchit'),
+	            id: 'hasCpSectionOverride',
+	            name: 'hasCpSectionOverride',
+	            on: settings.hasCpSectionOverride,
+	            errors: settings.getErrors('hasCpSectionOverride'),
+	        }) }}
+
+	        <input type="submit" class="btn submit" value="{{ 'Save'|t('searchit') }}">
+
+		{% endnamespace %}
+
+    </form>
+
+{% endblock %}
+
+

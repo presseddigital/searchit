@@ -1,0 +1,19 @@
+.fruit--abouticon svg {
+    display: block;
+    width: 100px;
+    height: 100px;
+}
+
+.fruit-licencekey {
+    margin: 0 !important;
+    padding: 3px !important;
+    background: #fbfcfd !important;
+    border-radius: 2px !important;
+}
+
+.fruit-licencekey input.text {
+    font-weight: bold;
+    font-size: 11px !important;
+    padding: 3px 7px 1px;
+    width: 19em;
+}

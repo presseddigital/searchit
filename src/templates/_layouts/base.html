@@ -1,0 +1,17 @@
+{% extends '_layouts/cp' %}
+{% do view.registerAssetBundle("fruitstudios\\searchit\\web\\assets\\searchit\\SearchitAssetBundle") %}
+
+{#
+	Tabs
+
+	{% set hideTabs = hideTabs ?? false %}
+	{% if not hideTabs %}
+	    {% set tabs = {
+	        tools: { label: "Tools" | t('searchit'), url: url('searchit/tools') },
+	        logs: { label: "Logs" | t('searchit'), url: url('searchit/logs') },
+	        settings: { label: "Settings" | t('searchit'), url: url('searchit/settings') },
+	    } %}
+	{% endif %}
+#}
+
+{% set title = ( title ?? 'Searchit' ) ~ ' ' %}

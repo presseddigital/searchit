@@ -1,0 +1,41 @@
+{% extends "searchit/_layouts/main" %}
+
+{% set config = craft.app.plugins.getPluginInfo('linkit') %}
+
+{% block content %}
+
+    <div class="fruit--abouticon">
+        {{ svg(craft.app.plugins.getPluginIconSvg('searchit')) }}
+    </div>
+
+    <h2>{{ "Thanks for using Searchit"|t('searchit') }}</h2>
+
+    <p>Bit of useful info on searchit, key features, what it does etc etc</p>
+
+    <p>Some links to the docs and changelog:</p>
+    <a class="btn" href="{{ craft.searchit.documentationUrl }}" target="_blank">{{ "Documentation" | t('searchit') }}</a>
+    <a class="btn" href="{{ craft.searchit.changelogUrl }}" target="_blank">{{ "Changelog" | t('searchit') }}</a>
+
+    <p>Please report any issues through github:</p>
+    <a class="btn" href="{{ craft.searchit.GitHubUrl('/issues') }}" target="_blank">{{ "Report an issue" | t('searchit') }}</a>
+    <hr>
+
+    <h2>{{ "Licence"|t('searchit') }}</h2>
+
+    {% set showLicenseKey = config.licenseKey or config.licenseKeyStatus != 'unknown' %}
+
+    <div class="flex">
+        <div class="pane fruit-licencekey">
+            <input class="text code{% if config.hasIssues %} error{% endif %}" size="29" maxlength="29" value="{{ config.licenseKey|replace('/.{4}/', '$0-')|trim('-') }}" placeholder="XXXX-XXXX-XXXX-XXXX-XXXX-XXXX" readonly>
+        </div>
+        <a class="btn{% if config.hasIssues %} submit{% endif %}{% if not (showLicenseKey and not config.licenseKey) %} hidden{% endif %}" href="{{ url('plugin-store/buy/searchit')}}">{{ "Buy now"|t('app') }}</a>
+        <div class="spinner hidden"></div>
+    </div>
+
+    {% if showLicenseKey and config.licenseStatusMessage %}
+        <p class="error">{{ config.licenseStatusMessage|raw }}</p>
+    {% endif %}
+
+{% endblock %}
+
+

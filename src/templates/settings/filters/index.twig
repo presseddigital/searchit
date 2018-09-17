@@ -1,0 +1,46 @@
+{% extends "searchit/_layouts/main" %}
+{% import "_includes/forms" as forms %}
+
+{% block content %}
+
+	{% set type = type ?? false %}
+	{% if type %}
+
+		{% set filters = settings[type] ?? null %}
+
+	 	<form action="" method="post" accept-charset="UTF-8">
+
+	        <input type="hidden" name="action" value="plugins/save-plugin-settings">
+			<input type="hidden" name="pluginHandle" value="searchit">
+	        {{ redirectInput('searchit/settings/filters/'~type) }}
+	        {{ csrfInput() }}
+
+	        {% namespace 'settings['~type~']' %}
+
+		     	{{ forms.lightswitchField({
+		            label: '{type} Search Filters '|t('searchit', {
+		            	type: type|ucfirst
+			        }),
+		            id: 'enabled',
+		            name: 'enabled',
+		            on: filters.enabled ?? false,
+		            errors: [] ?? settings.getErrors('entriesFiltersEnabled'),
+		        }) }}
+
+		       	{{ settings.getFilterSettingsHtml(type) | raw }}
+
+			{% endnamespace %}
+
+		    <input type="submit" class="btn submit" value="{{ 'Save Filters'|t('searchit') }}">
+
+	    </form>
+	{% else %}
+
+		<p>{{ 'Sorry this type is not supported yet.'|t('searchit') }}</p>
+
+	{% endif %}
+
+{#     {{ d(settings.getErrors()) }}
+ #}
+
+{% endblock %}

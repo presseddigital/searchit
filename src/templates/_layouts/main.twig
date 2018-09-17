@@ -1,0 +1,35 @@
+{% extends "searchit/_layouts/base" %}
+
+{% set title = "Searchit"|t('searchit') %}
+
+{% set navItems = {
+    'about': { title: "About"|t('searchit') },
+    'filters': { heading: "Filters"|t('searchit') },
+    'settings/filters/entries': { title: "Entries"|t('searchit') },
+    'settings/filters/users': { title: "Users"|t('searchit') },
+    'settings/filters/categories': { title: "Categories"|t('searchit') },
+    'settings/filters/assets': { title: "Assets"|t('searchit') },
+    'settings/filters/products': (craft.searchit.isCommerceInstalled ? { title: "Products"|t('searchit') } : null),
+    'settings': { heading: "Settings"|t('searchit') },
+    'settings/general': { title: "General"|t('searchit') },
+}|filter %}
+
+{% set selectedItemHandle = selectedItem ?? craft.app.request.getSegment(2)~(craft.app.request.getSegment(3) ? '/'~craft.app.request.getSegment(3))~(craft.app.request.getSegment(4) ? '/'~craft.app.request.getSegment(4)) %}
+
+{% set docTitle = ((navItems[selectedItemHandle] ?? false) ? navItems[selectedItemHandle].title ~' - ')~title %}
+
+{% block sidebar %}
+    <nav>
+        <ul>
+            {% for handle, item in navItems %}
+                {% if item.heading is defined %}
+                    <li class="heading"><span>{{ item.heading }}</span></li>
+                {% else %}
+                    <li>
+                        <a href="{{ url('searchit/'~handle) }}"{% if handle == selectedItemHandle %} class="sel"{% endif %}>{{ item.title }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </nav>
+{% endblock %}
