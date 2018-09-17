@@ -57,7 +57,8 @@ class SearchFilters extends Component
         $elementName = $this->getElementNameByType($type);
 
         $this->_optionsByType[$type][] = [
-            'handle' => 'global',
+            'id' => 'global',
+            'key' => 'global',
             'label' => Craft::t('searchit', 'Global Filters'),
             'instructions' => Craft::t('searchit', 'Filters to include on every {element} search.', [
                 'element' => ucfirst($elementName),
@@ -73,7 +74,9 @@ class SearchFilters extends Component
                         'name'
                     ])
                     ->where([
-                        'type' => 'structure',
+                        'or',
+                        ['type' => 'structure'],
+                        ['type' => 'channel'],
                     ])
                     ->orderBy(['name' => SORT_ASC])
                     ->all();
@@ -83,8 +86,8 @@ class SearchFilters extends Component
                     foreach($sectionRecords as $sectionRecord)
                     {
                         $this->_optionsByType[$type][] = [
-                            'id' => $sectionRecord['id'],
-                            'handle' => 'section'.$sectionRecord['id'],
+                            'id' => 'section'.$sectionRecord['id'],
+                            'key' => 'section:'.$sectionRecord['id'],
                             'label' => Craft::t('searchit', '{name} Filters', [
                                 'name' => $sectionRecord['name']
                             ]),
@@ -110,8 +113,8 @@ class SearchFilters extends Component
                     foreach($categoryGroupRecords as $categoryGroupRecord)
                     {
                         $this->_optionsByType[$type][] = [
-                            'id' => $categoryGroupRecord['id'],
-                            'handle' => 'categorygroup'.$categoryGroupRecord['id'],
+                            'id' => 'categorygroup'.$categoryGroupRecord['id'],
+                            'key' => 'group:'.$categoryGroupRecord['id'],
                             'label' => Craft::t('searchit', '{name} Filters', [
                                 'name' => $categoryGroupRecord['name']
                             ]),
@@ -138,8 +141,8 @@ class SearchFilters extends Component
                     foreach($userGroupRecords as $userGroupRecord)
                     {
                         $this->_optionsByType[$type][] = [
-                            'id' => $userGroupRecord['id'],
-                            'handle' => 'usergroup'.$userGroupRecord['id'],
+                            'id' => 'usergroup'.$userGroupRecord['id'],
+                            'key' => 'group'.$userGroupRecord['id'],
                             'label' => Craft::t('searchit', '{name} Filters', [
                                 'name' => $userGroupRecord['name']
                             ]),
@@ -165,8 +168,8 @@ class SearchFilters extends Component
                     foreach($volumeRecords as $volumeRecord)
                     {
                         $this->_optionsByType[$type][] = [
-                            'id' => $volumeRecord['id'],
-                            'handle' => 'volume'.$volumeRecord['id'],
+                            'id' => 'volume'.$volumeRecord['id'],
+                            'key' => 'folder'.$volumeRecord['id'],
                             'label' => Craft::t('searchit', '{name} Filters', [
                                 'name' => $volumeRecord['name']
                             ]),
@@ -195,8 +198,8 @@ class SearchFilters extends Component
                         foreach($productTypes as $productType)
                         {
                             $this->_optionsByType[$type][] = [
-                                'id' => $productType['id'],
-                                'handle' => 'producttype'.$productType['id'],
+                                'id' => 'producttype'.$productType['id'],
+                                'key' => 'productType:'.$productType['id'],
                                 'label' => Craft::t('searchit', '{name} Filters', [
                                     'name' => $productType['name']
                                 ]),
