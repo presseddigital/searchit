@@ -11,6 +11,10 @@ use craft\records\UserGroup as UserGroupRecord;
 use craft\records\Volume as VolumeRecord;
 use craft\records\Section as SectionRecord;
 
+use craft\elements\Category;
+use craft\elements\Entry;
+
+
 use craft\commerce\records\ProductType as ProductTypeRecord;
 
 class SearchFilters extends Component
@@ -55,6 +59,10 @@ class SearchFilters extends Component
     public function getOptionsByType(string $type)
     {
         $elementName = $this->getElementNameByType($type);
+
+        // TODO: Let's use elementType properly, pass element around to determine type etc etc
+        //     : Craft::$app->getElementIndexes()->getSources(Entry::class);
+        //     : Craft::dd(Entry::displayName());
 
         $this->_optionsByType[$type][] = [
             'id' => 'global',

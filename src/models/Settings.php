@@ -104,7 +104,7 @@ class Settings extends Model
         $options = [
             [
                 'value' => '',
-                'label' => ucfirst($elementName).' Filters ...',
+                'label' => ucfirst($elementName).' Filters',
             ]
         ];
 
@@ -119,7 +119,7 @@ class Settings extends Model
         $this->_filterSelects[$type][$key] = Craft::$app->getView()->renderTemplateMacro('_includes/forms', 'select', [
             [
                 'id' => '',
-                'name' => '',
+                'name' => 'searchFilters',
                 'options' => $options,
             ]
         ]);
