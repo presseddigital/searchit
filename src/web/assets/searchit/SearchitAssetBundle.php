@@ -20,7 +20,7 @@ class SearchitAssetBundle extends AssetBundle
         $this->js = [
             'js/vendor/polyfill.js',
             'js/vendor/extend.js',
-            'js/Searchit.js',
+            'js/SearchFilters.js',
         ];
 
         $this->css = [

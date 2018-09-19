@@ -27,6 +27,19 @@ class SearchFilters extends Component
     // Public Methods
     // =========================================================================
 
+    public function getActiveSearchFiltersArray(string $type = null)
+    {
+        $settings = Searchit::$plugin->getSettings();
+        $filters = [];
+
+        // foreach ($variable as $key => $value) {
+        //     # code...
+        // }
+        // Craft::dd($settings);
+
+        return $filters;
+    }
+
     public function getElementNameByType(string $type)
     {
         $name = '';

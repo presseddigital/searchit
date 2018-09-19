@@ -14,15 +14,18 @@ use fruitstudios\searchit\models\Settings;
 use fruitstudios\searchit\plugin\Routes as SearchitRoutes;
 use fruitstudios\searchit\plugin\Services as SearchitServices;
 use fruitstudios\searchit\web\twig\CraftVariableBehavior;
+use fruitstudios\searchit\web\assets\searchit\SearchitAssetBundle;
 
 use Craft;
 use craft\base\Plugin;
 use craft\services\Plugins;
 use craft\services\Fields;
 use craft\helpers\UrlHelper;
+use craft\helpers\Json;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\PluginEvent;
 use craft\web\twig\variables\CraftVariable;
+use craft\web\View;
 
 use craft\commerce\Plugin as CommercePlugin;
 
@@ -88,6 +91,8 @@ class Searchit extends Plugin
         $this->_registerElementTypes();
 
         Craft::info(Craft::t('searchit', '{name} plugin loaded', ['name' => $this->name]), __METHOD__);
+
+        $this->initSearchFilters();
     }
 
     public function beforeInstall(): bool
@@ -117,6 +122,22 @@ class Searchit extends Plugin
     public function isCommerceInstalled()
     {
         return self::$commerceInstalled;
+    }
+
+    public function initSearchFilters()
+    {
+        $request = Craft::$app->getRequest();
+        if($request->isCpRequest)
+        {
+            $view = Craft::$app->getView();
+            $js = [
+                'filters' => Searchit::$plugin->getSearchFilters()->getActiveSearchFiltersArray(),
+                'debug' =>
+            ];
+
+            $view->registerAssetBundle(SearchitAssetBundle::class);
+            $view->registerJs('new SearchFilters('.Json::encode($js).');', View::POS_END);
+        }
     }
 
     // Protected Methods
