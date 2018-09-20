@@ -129,12 +129,15 @@ class Searchit extends Plugin
         $request = Craft::$app->getRequest();
         if($request->isCpRequest)
         {
-            $view = Craft::$app->getView();
+            $general = Craft::$app->getConfig()->getGeneral();
             $js = [
                 'filters' => Searchit::$plugin->getSearchFilters()->getActiveSearchFiltersArray(),
-                'debug' =>
+                'debug' => $general->devMode,
+                'csrfTokenName' => $general->csrfTokenName,
+                'csrfTokenValue' => $request->getCsrfToken(),
             ];
 
+            $view = Craft::$app->getView();
             $view->registerAssetBundle(SearchitAssetBundle::class);
             $view->registerJs('new SearchFilters('.Json::encode($js).');', View::POS_END);
         }

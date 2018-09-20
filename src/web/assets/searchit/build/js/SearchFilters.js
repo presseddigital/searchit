@@ -53,14 +53,11 @@ var SearchFilters = (function() {
 
 		api.init = function(options) {
 
-			settings = extend(defaults, options || {});
+			_settings = extend(defaults, options || {});
 
-			if (settings.debug) {
-				console.log('[SearchFilters]', settings);
+			if (_settings.debug) {
+				console.log('[SearchFilters]', _settings);
 			}
-
-
-
 
 
 			// dom.field = document.getElementById(settings.namespacedId);
@@ -73,9 +70,9 @@ var SearchFilters = (function() {
 			// 	}
 
 
-			// 	dom.handleInput = document.getElementById(settings.namespacedId + '-handle');
+			// 	dom.handleInput = document.getElementById(_settings.namespacedId + '-handle');
 
-			// 	dom.opacityInput = document.getElementById(settings.namespacedId + '-opacity');
+			// 	dom.opacityInput = document.getElementById(_settings.namespacedId + '-opacity');
 			// 	if(dom.opacityInput) {
 			// 		dom.opacityInput.addEventListener("change", opacityHandler, false);
 			// 		dom.opacityInput.addEventListener("keyup", opacityHandler, false);
