@@ -32,6 +32,41 @@ class SearchFilters extends Component
         $settings = Searchit::$plugin->getSettings();
         $filters = [];
 
+        $filters = [
+            Category::class => [
+                '*' => [
+                    [
+                        '' => 'Filter Group 1 Name',
+                        'status: 1' => 'Filter 1',
+                        'id: 1 AND body: figure' => 'Filter 2',
+                        'asdfasd' => 'Filter 3',
+                    ],
+                    [
+                        '' => 'Filter Group 2 Name',
+                        'status: 1' => 'Filter 1',
+                        'id: 1 AND body: figure' => 'Filter 2',
+                        'asdfasd' => 'Filter 3',
+                    ]
+                ],
+                'group:1' => [
+                    [
+                        '' => 'Filter Group 1 Name',
+                        'status: 1' => 'Filter 1',
+                        'id: 1 AND body: figure' => 'Filter 2',
+                        'asdfasd' => 'Filter 3',
+                    ]
+                ],
+                'group:2' => [
+                    [
+                        '' => 'Filter Group 2 Name',
+                        'status: 1' => 'Filter 1',
+                        'id: 1 AND body: figure' => 'Filter 2',
+                        'asdfasd' => 'Filter 3',
+                    ]
+                ]
+            ]
+        ];
+
         // foreach ($variable as $key => $value) {
         //     # code...
         // }

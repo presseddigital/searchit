@@ -17,9 +17,22 @@ var SearchFilters = (function() {
 		// =========================================================================
 
 		var _settings;
+		var _filters;
 
 		// Private Methods
 		// =========================================================================
+
+		var prepFilters = function() {
+			if(_settings.filters) {
+
+			}
+		};
+
+		var getFilters = function(type, key) {
+			return _filters[type][key] || false;
+		}
+
+
 
 		// var isValidHex = function(value) {
 		// 	return /^#[0-9a-f]{3}(?:[0-9a-f]{3})?$/i.test(value);
@@ -59,6 +72,7 @@ var SearchFilters = (function() {
 				console.log('[SearchFilters]', _settings);
 			}
 
+			setupFilters();
 
 			// dom.field = document.getElementById(settings.namespacedId);
 			// if(dom.field) {
