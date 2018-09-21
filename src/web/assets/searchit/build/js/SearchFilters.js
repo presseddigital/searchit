@@ -18,6 +18,7 @@ var SearchFilters = (function() {
 
 		var _settings;
 		var _filters;
+		var _elementIndex;
 
 		// Private Methods
 		// =========================================================================
@@ -72,7 +73,19 @@ var SearchFilters = (function() {
 				console.log('[SearchFilters]', _settings);
 			}
 
-			setupFilters();
+			_elementIndex = Craft.elementIndex;
+			console.log('fasdfasdfasdfadsfasdfasdfasdasdfads');
+			console.log(_elementIndex);
+			if(typeof _elementIndex !== 'undefined')
+			{
+				console.log(_elementIndex.getSourceState());
+			}
+			else
+			{
+				console.log('nope');
+			}
+
+			prepFilters();
 
 			// dom.field = document.getElementById(settings.namespacedId);
 			// if(dom.field) {
