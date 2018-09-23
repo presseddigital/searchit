@@ -139,7 +139,7 @@ class Searchit extends Plugin
 
             $view = Craft::$app->getView();
             $view->registerAssetBundle(SearchitAssetBundle::class);
-            $view->registerJs('new SearchFilters('.Json::encode($js).');', View::POS_END);
+            $view->registerJs('new ElementFilters('.Json::encode($js).');');
         }
     }
 

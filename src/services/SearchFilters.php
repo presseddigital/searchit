@@ -33,32 +33,47 @@ class SearchFilters extends Component
         $filters = [];
 
         $filters = [
-            Category::class => [
-                '*' => [
+            [
+                'elementType' => Category::class,
+                'source' => '*',
+                'filters' => [
                     [
-                        '' => 'Filter Group 1 Name',
+                        '' => 'Global Filters',
                         'status: 1' => 'Filter 1',
                         'id: 1 AND body: figure' => 'Filter 2',
                         'asdfasd' => 'Filter 3',
                     ],
                     [
+                        '' => 'More Filters',
+                        'fsadfasd' => 'Some'
+                    ]
+                ]
+            ],
+            [
+                'elementType' => Category::class,
+                'source' => 'group:1',
+                'filters' => [
+                    [
                         '' => 'Filter Group 2 Name',
                         'status: 1' => 'Filter 1',
                         'id: 1 AND body: figure' => 'Filter 2',
                         'asdfasd' => 'Filter 3',
-                    ]
-                ],
-                'group:1' => [
+                    ],
                     [
                         '' => 'Filter Group 1 Name',
                         'status: 1' => 'Filter 1',
                         'id: 1 AND body: figure' => 'Filter 2',
                         'asdfasd' => 'Filter 3',
                     ]
-                ],
-                'group:2' => [
+
+                ]
+            ],
+            [
+                'elementType' => Category::class,
+                'source' => 'group:2',
+                'filters' => [
                     [
-                        '' => 'Filter Group 2 Name',
+                        '' => 'Filter Group 1 Name',
                         'status: 1' => 'Filter 1',
                         'id: 1 AND body: figure' => 'Filter 2',
                         'asdfasd' => 'Filter 3',
