@@ -22,76 +22,88 @@ var ElementFilters = (function() {
 		var initElementFilters = function() {
 
 			var filters = Array.from(settings.filters);
-			if(typeof elementIndex !== 'undefined' && filters.length > 0)
-			{
-				filters.forEach(function (filter, i) {
+			filters.forEach(function (filter, i) {
 
-					var container = document.createElement('div');
-					container.setAttribute('class', 'searchit--filters');
-					container.setAttribute('data-element-filters', filter.elementType);
+				var container = document.createElement('div');
+				container.setAttribute('class', 'searchit--filters');
+				container.setAttribute('data-element-filters', filter.elementType);
 
-					var selects = Array.from(filter.filters);
-					selects.forEach(function (options, i) {
+				var selects = Array.from(filter.filters);
+				selects.forEach(function (options, i) {
 
-						var wrapper = document.createElement('div');
-						wrapper.setAttribute('class', 'select');
-						container.appendChild(wrapper);
+					var wrapper = document.createElement('div');
+					wrapper.setAttribute('class', 'select');
+					container.appendChild(wrapper);
 
-						var select = document.createElement('select');
-						wrapper.appendChild(select);
+					var select = document.createElement('select');
+					wrapper.appendChild(select);
 
-						Object.keys(options).forEach(function (key) {
-							var option = document.createElement('option');
-						    option.value = key;
-						    option.text = options[key];
-						    select.appendChild(option);
-						});
-
+					Object.keys(options).forEach(function (key) {
+						var option = document.createElement('option');
+					    option.value = key;
+					    option.text = options[key];
+					    select.appendChild(option);
 					});
 
-					if(!elementFilters.hasOwnProperty(filter.elementType)) {
-						elementFilters[filter.elementType] = {};
-					}
-					elementFilters[filter.elementType][filter.source] = container;
 				});
 
-				var toolbar = document.querySelector('.toolbar .flex');
-				console.log(toolbar);
-				if(toolbar) {
-					toolbar.prepend(getElementFilters(elementIndex.elementType, '*'));
+				if(!elementFilters.hasOwnProperty(filter.elementType)) {
+					elementFilters[filter.elementType] = {};
 				}
-			}
+				elementFilters[filter.elementType][filter.source] = container;
+			});
+
 		};
 
 		var getElementFilters = function(elementType, source) {
+
 			if(!elementFilters.hasOwnProperty(elementType) || !elementFilters[elementType].hasOwnProperty(source))
 			{
 				return false;
 			}
 			return elementFilters[elementType][source];
+
+		}
+
+		var tiggerChangeEvent = function (element)
+		{
+			if ("createEvent" in document) {
+			    var evt = document.createEvent("HTMLEvents");
+			    evt.initEvent("change", false, true);
+			    element.dispatchEvent(evt);
+			}
+			else
+			{
+			    element.fireEvent("onchange");
+			}
 		}
 
 		// Event Handlers
 		// =========================================================================
 
-		// var colourHandler = function(event) {
+		var filterHandler = function(event) {
 
-		// 	var colour = event.target.closest(selectors.searchitColour);
-		// 	if (!colour) return;
+			var filter = event.target;
+			var filters = filter.closest('[data-element-filters]');
+			if (!filters) return;
 
-		// 	event.preventDefault();
-		// 	event.stopPropagation();
+			event.preventDefault();
 
-		// 	var isSelected = colour.classList.contains(classes.selectedColour);
+			var toolbar = filter.closest('.toolbar');
+			var search = toolbar.querySelector('.search input');
 
-		// 	clearSearchitColourSelection();
-		// 	clearCustomColourSelection(true);
+			var searchValue = search.value.trim();
 
-		// 	if(!isSelected) {
-		// 		colour.classList.add(classes.selectedColour);
-		// 		dom.handleInput.value = colour.getAttribute('data-handle');
-		// 	}
-		// };
+			for (var i = 0; i < filter.options.length; i++) {
+				if(filter.options[i].value != '') {
+					searchValue = searchValue.replace(filter.options[i].value, '');
+				}
+		    }
+
+			search.value = (filter.value + ' ' + searchValue).trim();
+			tiggerChangeEvent(search);
+
+		};
 
 
 		// Public Methods
@@ -106,8 +118,17 @@ var ElementFilters = (function() {
 			}
 
 			elementIndex = Craft.elementIndex;
+			if(typeof elementIndex !== 'undefined' && settings.filters.length > 0)
+			{
+				initElementFilters();
+				document.addEventListener('change', filterHandler, false);
 
-			initElementFilters();
+				var toolbar = document.querySelector('.toolbar .flex');
+				if(toolbar) {
+					toolbar.prepend(getElementFilters(elementIndex.elementType, '*'));
+				}
+			}
+
 		};
 
 		api.init(options);
