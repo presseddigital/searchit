@@ -65,6 +65,16 @@ var ElementFilters = (function() {
 
 		}
 
+		var renderElementFilters = function() {
+
+			var toolbar = document.querySelector('.toolbar .flex');
+			if(toolbar && elementIndex) {
+				toolbar.prepend(getElementFilters(elementIndex.elementType, elementIndex.sourceKey));
+			}
+
+
+		}
+
 		var tiggerChangeEvent = function (element)
 		{
 			if ("createEvent" in document) {
@@ -122,11 +132,7 @@ var ElementFilters = (function() {
 			{
 				initElementFilters();
 				document.addEventListener('change', filterHandler, false);
-
-				var toolbar = document.querySelector('.toolbar .flex');
-				if(toolbar) {
-					toolbar.prepend(getElementFilters(elementIndex.elementType, '*'));
-				}
+				renderElementFilters();
 			}
 
 		};
