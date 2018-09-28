@@ -1,0 +1,56 @@
+{
+	"name": "fruitstudios/searchit",
+	"description": "Configurable search filters for turbocharged search in the Craft CP.",
+	"type": "craft-plugin",
+	"version": "0.0.1",
+	"keywords": [
+		"craft",
+		"cms",
+		"craftcms",
+		"craft-plugin",
+		"search it",
+		"searchit",
+		"fruit studios"
+	],
+	"support": {
+		"email": "hi@fruitstudios.co.uk",
+		"issues":
+			"https://github.com/fruitstudios/craft-searchit/issues?state=open",
+		"source": "https://github.com/fruitstudios/craft-searchit",
+		"docs": "https://github.com/fruitstudios/craft-searchit"
+	},
+	"license": "proprietary",
+	"authors": [
+		{
+			"name": "Fruit Studios",
+			"homepage": "https://fruitstudios.co.uk"
+		}
+	],
+	"require": {
+		"craftcms/cms": "^3.0.2"
+	},
+	"repositories": [
+		{
+			"type": "composer",
+			"url": "https://asset-packagist.org"
+		}
+	],
+	"autoload": {
+		"psr-4": {
+			"fruitstudios\\searchit\\": "src/"
+		}
+	},
+	"extra": {
+		"name": "searchit",
+		"handle": "searchit",
+		"hasCpSettings": false,
+        "hasCpSection": false,
+		"changelogUrl": "https://raw.githubusercontent.com/fruitstudios/craft-searchit/master/CHANGELOG.md",
+		"class": "fruitstudios\\searchit\\searchit",
+        "components": {
+            "services": "fruitstudios\\searchit\\services\\LinkitService"
+        }
+	}
+}
+
+
