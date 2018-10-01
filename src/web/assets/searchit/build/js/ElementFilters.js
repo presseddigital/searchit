@@ -13,7 +13,9 @@ var ElementFilters = (function() {
 
 		var api = {};
 		var settings;
+
 		var elementIndex;
+		var elementIndexes = {}; // TODO: Do we need to store elementIndexes in here
 		var elementFilters = {};
 
 		// Private Methods
@@ -65,10 +67,16 @@ var ElementFilters = (function() {
 
 		}
 
-		var setElementFilters = function() {
+		var updateElementFilters = function() {
 
-			var toolbar = document.querySelector('.toolbar .flex');
+			// var toolbar = document.querySelector('.toolbar .flex');
+			var toolbar = elementIndex.$toolbarFlexContainer[0] || false;
 			if(toolbar && elementIndex) {
+
+				var activeFilters = toolbar.querySelector('.searchit--filters');
+				if(activeFilters) {
+					activeFilters.remove();
+				}
 
 				var filters = getElementFilters(elementIndex.elementType, elementIndex.sourceKey);
 				if(filters) {
@@ -128,21 +136,23 @@ var ElementFilters = (function() {
 			settings = extend(defaults, options || {});
 
 			if (settings.debug) {
-				console.log('[SearchFilters]', settings);
+				console.log('[ElementFilters][Craft]', Craft);
+				console.log('[ElementFilters][settings]', settings);
 			}
 
 			elementIndex = Craft.elementIndex;
 			if(typeof elementIndex !== 'undefined' && settings.filters.length > 0)
 			{
-				initElementFilters();
-				setElementFilters();
+				console.log(elementIndex);
 
+				initElementFilters();
 				document.addEventListener('change', filterHandler, false);
 
 				// https://craftcms.stackexchange.com/questions/25827/garnish-event-when-changing-category-group?rq=1
 				Craft.elementIndex.on('selectSource', function(){
 					updateElementFilters();
 				});
+				updateElementFilters();
 			}
 
 		};
