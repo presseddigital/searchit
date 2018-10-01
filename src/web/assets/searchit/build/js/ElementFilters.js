@@ -65,11 +65,15 @@ var ElementFilters = (function() {
 
 		}
 
-		var renderElementFilters = function() {
+		var setElementFilters = function() {
 
 			var toolbar = document.querySelector('.toolbar .flex');
 			if(toolbar && elementIndex) {
-				toolbar.prepend(getElementFilters(elementIndex.elementType, elementIndex.sourceKey));
+
+				var filters = getElementFilters(elementIndex.elementType, elementIndex.sourceKey);
+				if(filters) {
+					toolbar.prepend(filters);
+				}
 			}
 
 
@@ -131,8 +135,14 @@ var ElementFilters = (function() {
 			if(typeof elementIndex !== 'undefined' && settings.filters.length > 0)
 			{
 				initElementFilters();
+				setElementFilters();
+
 				document.addEventListener('change', filterHandler, false);
-				renderElementFilters();
+
+				// https://craftcms.stackexchange.com/questions/25827/garnish-event-when-changing-category-group?rq=1
+				Craft.elementIndex.on('selectSource', function(){
+					updateElementFilters();
+				});
 			}
 
 		};
