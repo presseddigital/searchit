@@ -79,6 +79,53 @@ class SearchFilters extends Component
                         'asdfasd' => 'Filter 3',
                     ]
                 ]
+            ],
+            [
+                'elementType' => Entry::class,
+                'source' => '*',
+                'filters' => [
+                    [
+                        '' => 'Global Filters',
+                        'status: 1' => 'Filter 1',
+                        'id: 1 AND body: figure' => 'Filter 2',
+                        'asdfasd' => 'Filter 3',
+                    ],
+                    [
+                        '' => 'More Filters',
+                        'fsadfasd' => 'Some'
+                    ]
+                ]
+            ],
+            [
+                'elementType' => Entry::class,
+                'source' => 'section:7',
+                'filters' => [
+                    [
+                        '' => 'Filter Group 2 Name',
+                        'status: 1' => 'Filter 1',
+                        'id: 1 AND body: figure' => 'Filter 2',
+                        'asdfasd' => 'Filter 3',
+                    ],
+                    [
+                        '' => 'Filter Group 1 Name',
+                        'status: 1' => 'Filter 1',
+                        'id: 1 AND body: figure' => 'Filter 2',
+                        'asdfasd' => 'Filter 3',
+                    ]
+
+                ]
+            ],
+            [
+                'elementType' => Entry::class,
+                'source' => 'section:2',
+                'filters' => [
+                    [
+                        '' => 'Filter Group 1 Name',
+                        'status: 1' => 'Filter 1',
+                        'id: 1 AND body: figure' => 'Filter 2',
+                        'asdfasd' => 'Filter 3',
+                    ]
+                ]
             ]
         ];
 

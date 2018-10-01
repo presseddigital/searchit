@@ -15,8 +15,15 @@ var ElementFilters = (function() {
 		var settings;
 
 		var elementIndex;
-		var elementIndexes = {}; // TODO: Do we need to store elementIndexes in here
+		var elementIndexType;
 		var elementFilters = {};
+
+		var dom = {
+			holder: null,
+			toolbar: null,
+			search: null,
+			searchHolder: null,
+		};
 
 		// Private Methods
 		// =========================================================================
@@ -69,18 +76,17 @@ var ElementFilters = (function() {
 
 		var updateElementFilters = function() {
 
-			// var toolbar = document.querySelector('.toolbar .flex');
-			var toolbar = elementIndex.$toolbarFlexContainer[0] || false;
-			if(toolbar && elementIndex) {
+			if(dom.toolbar && elementIndex) {
 
-				var activeFilters = toolbar.querySelector('.searchit--filters');
+				var activeFilters = dom.toolbar.querySelector('.searchit--filters');
 				if(activeFilters) {
 					activeFilters.remove();
 				}
 
 				var filters = getElementFilters(elementIndex.elementType, elementIndex.sourceKey);
 				if(filters) {
-					toolbar.prepend(filters);
+					dom.searchHolder.parentNode.insertBefore(filters, dom.searchHolder);
+					// dom.toolbar.prepend(filters);
 				}
 			}
 
@@ -111,19 +117,15 @@ var ElementFilters = (function() {
 
 			event.preventDefault();
 
-			var toolbar = filter.closest('.toolbar');
-			var search = toolbar.querySelector('.search input');
-
-			var searchValue = search.value.trim();
-
+			var searchValue = dom.search.value.trim();
 			for (var i = 0; i < filter.options.length; i++) {
 				if(filter.options[i].value != '') {
 					searchValue = searchValue.replace(filter.options[i].value, '');
 				}
 		    }
 
-			search.value = (filter.value + ' ' + searchValue).trim();
-			tiggerChangeEvent(search);
+			dom.search.value = (filter.value + ' ' + searchValue).trim();
+			tiggerChangeEvent(dom.search);
 
 		};
 
@@ -136,24 +138,48 @@ var ElementFilters = (function() {
 			settings = extend(defaults, options || {});
 
 			if (settings.debug) {
-				console.log('[ElementFilters][Craft]', Craft);
 				console.log('[ElementFilters][settings]', settings);
 			}
 
-			elementIndex = Craft.elementIndex;
-			if(typeof elementIndex !== 'undefined' && settings.filters.length > 0)
-			{
-				console.log(elementIndex);
-
-				initElementFilters();
-				document.addEventListener('change', filterHandler, false);
-
-				// https://craftcms.stackexchange.com/questions/25827/garnish-event-when-changing-category-group?rq=1
-				Craft.elementIndex.on('selectSource', function(){
-					updateElementFilters();
-				});
-				updateElementFilters();
+			if(!settings.filters.length) {
+				return;
 			}
+
+			// Get Element Index
+			if(typeof Craft.elementIndex !== 'undefined') {
+				elementIndex = Craft.elementIndex;
+				elementIndexType = 'inline';
+			} else {
+				var modal = Garnish.Modal.visibleModal;
+				if(modal && typeof modal.elementIndex !== 'undefined') {
+					elementIndex = modal.elementIndex;
+					elementIndexType = 'modal';
+				}
+			}
+
+			if(!elementIndex) {
+				return;
+			}
+
+			if (settings.debug) {
+				console.log('[ElementFilters][elementIndex]', elementIndexType, elementIndex);
+			}
+
+			// Store DOM
+			dom.holder = elementIndex.$toolbar[0];
+			dom.toolbar = elementIndex.$toolbarFlexContainer[0];
+			dom.search = elementIndex.$search[0];
+			dom.searchHolder = dom.search.closest('.search');
+
+
+			initElementFilters();
+			dom.holder.addEventListener('change', filterHandler, false);
+
+			// https://craftcms.stackexchange.com/questions/25827/garnish-event-when-changing-category-group?rq=1
+			elementIndex.on('selectSource', function() {
+				updateElementFilters();
+			});
+			updateElementFilters();
 
 		};
 
