@@ -34,6 +34,15 @@
 	            errors: settings.getErrors('hasCpSectionOverride'),
 	        }) }}
 
+	        {{ forms.lightswitchField({
+	            label: 'Compact Mode'|t('searchit'),
+	            instructions: 'Enable compact mode to free up space in the element search bar'|t('searchit'),
+	            id: 'compactMode',
+	            name: 'compactMode',
+	            on: settings.compactMode,
+	            errors: settings.getErrors('compactMode'),
+	        }) }}
+
 	        <input type="submit" class="btn submit" value="{{ 'Save'|t('searchit') }}">
 
 		{% endnamespace %}

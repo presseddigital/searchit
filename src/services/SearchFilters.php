@@ -38,14 +38,10 @@ class SearchFilters extends Component
                 'source' => '*',
                 'filters' => [
                     [
-                        '' => 'Global Filters',
-                        'status: 1' => 'Filter 1',
-                        'id: 1 AND body: figure' => 'Filter 2',
-                        'asdfasd' => 'Filter 3',
-                    ],
-                    [
-                        '' => 'More Filters',
-                        'fsadfasd' => 'Some'
+                        '' => 'Global',
+                        'fg:1' => 'Filter 1',
+                        'fg:2' => 'Filter 2',
+                        'fg:3' => 'Filter 3',
                     ]
                 ]
             ],
@@ -54,18 +50,17 @@ class SearchFilters extends Component
                 'source' => 'group:1',
                 'filters' => [
                     [
-                        '' => 'Filter Group 2 Name',
-                        'status: 1' => 'Filter 1',
-                        'id: 1 AND body: figure' => 'Filter 2',
-                        'asdfasd' => 'Filter 3',
+                        '' => 'Filter A',
+                        'fa:1' => 'Filter 1',
+                        'fa:2' => 'Filter 2',
+                        'fa:3' => 'Filter 3',
                     ],
                     [
-                        '' => 'Filter Group 1 Name',
-                        'status: 1' => 'Filter 1',
-                        'id: 1 AND body: figure' => 'Filter 2',
-                        'asdfasd' => 'Filter 3',
+                        '' => 'Filter B',
+                        'fb:1' => 'Filter 1',
+                        'fb:2' => 'Filter 2',
+                        'fb:3' => 'Filter 3',
                     ]
-
                 ]
             ],
             [
@@ -73,10 +68,10 @@ class SearchFilters extends Component
                 'source' => 'group:2',
                 'filters' => [
                     [
-                        '' => 'Filter Group 1 Name',
-                        'status: 1' => 'Filter 1',
-                        'id: 1 AND body: figure' => 'Filter 2',
-                        'asdfasd' => 'Filter 3',
+                        '' => 'Filter A',
+                        'fa:1' => 'Filter 1',
+                        'fa:2' => 'Filter 2',
+                        'fa:3' => 'Filter 3',
                     ]
                 ]
             ],
@@ -85,14 +80,10 @@ class SearchFilters extends Component
                 'source' => '*',
                 'filters' => [
                     [
-                        '' => 'Global Filters',
-                        'status: 1' => 'Filter 1',
-                        'id: 1 AND body: figure' => 'Filter 2',
-                        'asdfasd' => 'Filter 3',
-                    ],
-                    [
-                        '' => 'More Filters',
-                        'fsadfasd' => 'Some'
+                        '' => 'Global',
+                        'fg:1' => 'Filter 1',
+                        'fg:2' => 'Filter 2',
+                        'fg:3' => 'Filter 3',
                     ]
                 ]
             ],
@@ -101,18 +92,17 @@ class SearchFilters extends Component
                 'source' => 'section:7',
                 'filters' => [
                     [
-                        '' => 'Filter Group 2 Name',
-                        'status: 1' => 'Filter 1',
-                        'id: 1 AND body: figure' => 'Filter 2',
-                        'asdfasd' => 'Filter 3',
+                        '' => 'Filter A',
+                        'fa:1' => 'Filter 1',
+                        'fa:2' => 'Filter 2',
+                        'fa:3' => 'Filter 3',
                     ],
                     [
-                        '' => 'Filter Group 1 Name',
-                        'status: 1' => 'Filter 1',
-                        'id: 1 AND body: figure' => 'Filter 2',
-                        'asdfasd' => 'Filter 3',
+                        '' => 'Filter B',
+                        'fb:1' => 'Filter 1',
+                        'fb:2' => 'Filter 2',
+                        'fb:3' => 'Filter 3',
                     ]
-
                 ]
             ],
             [
@@ -120,10 +110,10 @@ class SearchFilters extends Component
                 'source' => 'section:2',
                 'filters' => [
                     [
-                        '' => 'Filter Group 1 Name',
-                        'status: 1' => 'Filter 1',
-                        'id: 1 AND body: figure' => 'Filter 2',
-                        'asdfasd' => 'Filter 3',
+                        '' => 'Filter A',
+                        'fa:1' => 'Filter 1',
+                        'fa:2' => 'Filter 2',
+                        'fa:3' => 'Filter 3',
                     ]
                 ]
             ]

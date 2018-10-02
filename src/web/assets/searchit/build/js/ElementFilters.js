@@ -31,16 +31,17 @@ var ElementFilters = (function() {
 		var initElementFilters = function() {
 
 			var filters = Array.from(settings.filters);
-			filters.forEach(function (filter, i) {
+			filters.forEach(function (filter, filterIndex) {
 
 				var container = document.createElement('div');
 				container.setAttribute('class', 'searchit--filters');
 				container.setAttribute('data-element-filters', filter.elementType);
 
 				var selects = Array.from(filter.filters);
-				selects.forEach(function (options, i) {
+				selects.forEach(function (options, optionIndex) {
 
 					var wrapper = document.createElement('div');
+					wrapper.setAttribute('id', 'element-filter-'+filterIndex+'-'+optionIndex);
 					wrapper.setAttribute('class', 'select');
 					container.appendChild(wrapper);
 
@@ -86,7 +87,6 @@ var ElementFilters = (function() {
 				var filters = getElementFilters(elementIndex.elementType, elementIndex.sourceKey);
 				if(filters) {
 					dom.searchHolder.parentNode.insertBefore(filters, dom.searchHolder);
-					// dom.toolbar.prepend(filters);
 				}
 			}
 

@@ -19,6 +19,8 @@ class Settings extends Model
     public $pluginNameOverride = 'Searchit';
 	public $hasCpSectionOverride = false;
 
+    public $compactMode = true;
+
     public $entries;
     public $users;
     public $categories;
@@ -33,6 +35,8 @@ class Settings extends Model
         return [
             ['pluginNameOverride', 'string'],
             ['pluginNameOverride', 'default', 'value' => 'Searchit'],
+            ['compactMode', 'boolean'],
+            ['compactMode', 'default', 'value' => false],
             ['hasCpSectionOverride', 'boolean'],
             ['hasCpSectionOverride', 'default', 'value' => false],
             [
