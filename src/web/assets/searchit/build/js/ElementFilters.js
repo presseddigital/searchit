@@ -171,6 +171,9 @@ var ElementFilters = (function() {
 			dom.search = elementIndex.$search[0];
 			dom.searchHolder = dom.search.closest('.search');
 
+			if(settings.compactMode) {
+				dom.holder.classList.add('searchit--compact');
+			}
 
 			initElementFilters();
 			dom.holder.addEventListener('change', filterHandler, false);

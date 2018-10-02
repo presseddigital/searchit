@@ -132,6 +132,7 @@ class Searchit extends Plugin
             $general = Craft::$app->getConfig()->getGeneral();
             $js = [
                 'filters' => Searchit::$plugin->getSearchFilters()->getActiveSearchFiltersArray(),
+                'compactMode' => (bool) self::$settings->compactMode,
                 'debug' => $general->devMode,
                 'csrfTokenName' => $general->csrfTokenName,
                 'csrfTokenValue' => $request->getCsrfToken(),
