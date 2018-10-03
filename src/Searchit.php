@@ -141,6 +141,19 @@ class Searchit extends Plugin
             $view = Craft::$app->getView();
             $view->registerAssetBundle(SearchitAssetBundle::class);
             $view->registerJs('new ElementFilters('.Json::encode($js).');');
+            if(self::$settings->compactMode)
+            {
+                $view->registerCss('
+                    .toolbar .statusmenubtn { font-size: 0; }
+                    .toolbar .statusmenubtn::after { font-size: 14px; }
+                    .toolbar .statusmenubtn .status { vertical-align: middle; margin-right: 0; }
+                    .toolbar .sortmenubtn { font-size: 0; }
+                    .toolbar .sortmenubtn::before,
+                    .toolbar .sortmenubtn::after { font-size: 14px; }
+                    .toolbar .spinner { position: absolute; right: 76px; top: 0px; }
+                    body.ltr .sortmenubtn[data-icon]:not(:empty):before { margin-right: 0; }
+                ');
+            }
         }
     }
 
