@@ -20,6 +20,7 @@ use Craft;
 use craft\base\Plugin;
 use craft\services\Plugins;
 use craft\services\Fields;
+use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
 use craft\helpers\Json;
 use craft\events\RegisterComponentTypesEvent;
@@ -131,6 +132,7 @@ class Searchit extends Plugin
         {
             $general = Craft::$app->getConfig()->getGeneral();
             $js = [
+                'id' => StringHelper::UUID(),
                 'filters' => Searchit::$plugin->getSearchFilters()->getActiveSearchFiltersArray(),
                 'compactMode' => (bool) self::$settings->compactMode,
                 'debug' => $general->devMode,

@@ -3,7 +3,11 @@ var ElementFilters = (function() {
 
 	var defaults = {
 		filters: {},
-		debug: false
+		debug: false,
+		attributes: {
+			id: 'data-element-filters-id',
+			filters: 'data-element-filters',
+		}
 	};
 
 	var constructor = function(options) {
@@ -13,16 +17,15 @@ var ElementFilters = (function() {
 
 		var api = {};
 		var settings;
-
 		var elementIndex;
 		var elementIndexType;
 		var elementFilters = {};
 
 		var dom = {
-			holder: null,
+			toolbarHolder: null,
 			toolbar: null,
-			search: null,
 			searchHolder: null,
+			search: null,
 		};
 
 		// Private Methods
@@ -30,12 +33,19 @@ var ElementFilters = (function() {
 
 		var initElementFilters = function() {
 
+			// DOM Elements
+			dom.toolbarHolder = elementIndex.$toolbar[0];
+			dom.toolbar = elementIndex.$toolbarFlexContainer[0];
+			dom.search = elementIndex.$search[0];
+			dom.searchHolder = dom.search.closest('.search');
+
+			// Filters
 			var filters = Array.from(settings.filters);
 			filters.forEach(function (filter, filterIndex) {
 
 				var container = document.createElement('div');
 				container.setAttribute('class', 'searchit--filters');
-				container.setAttribute('data-element-filters', filter.elementType);
+				container.setAttribute(settings.attributes.filters, filter.elementType);
 
 				var selects = Array.from(filter.filters);
 				selects.forEach(function (options, optionIndex) {
@@ -63,6 +73,19 @@ var ElementFilters = (function() {
 				elementFilters[filter.elementType][filter.source] = container;
 			});
 
+			// Listeners
+			dom.toolbar.addEventListener('change', filterHandler, false);
+
+			elementIndex.on('updateElements', function() {
+				checkElementFilters();
+			});
+
+			elementIndex.on('selectSource', function() {
+				updateElementFilters();
+			});
+
+			// Status
+			dom.toolbarHolder.setAttribute(settings.attributes.id, settings.id);
 		};
 
 		var getElementFilters = function(elementType, source) {
@@ -79,8 +102,9 @@ var ElementFilters = (function() {
 
 			if(dom.toolbar && elementIndex) {
 
-				var activeFilters = dom.toolbar.querySelector('.searchit--filters');
+				var activeFilters = getActiveFilters();
 				if(activeFilters) {
+					resetFilters(activeFilters);
 					activeFilters.remove();
 				}
 
@@ -89,8 +113,39 @@ var ElementFilters = (function() {
 					dom.searchHolder.parentNode.insertBefore(filters, dom.searchHolder);
 				}
 			}
+		}
 
+		var checkElementFilters = function() {
 
+			console.log('elemens up');
+
+			if(dom.toolbar && elementIndex) {
+				var searchValue = dom.search.value;
+				var activeFilters = getActiveFilters();
+				if(activeFilters) {
+					var selects = activeFilters.querySelectorAll('select');
+					if(selects) {
+						selects.forEach(function (select, index) {
+							if(!searchValue.includes(select.value)) {
+								select.value = '';
+							}
+						});
+					}
+				}
+			}
+		}
+
+		var resetFilters = function(context) {
+			var selects = context.querySelectorAll('select');
+			if(selects) {
+				selects.forEach(function (select, index) {
+					select.value = '';
+				});
+			}
+		}
+
+		var getActiveFilters = function(context) {
+			return dom.toolbar.querySelector('.searchit--filters');
 		}
 
 		var tiggerChangeEvent = function (element)
@@ -112,7 +167,7 @@ var ElementFilters = (function() {
 		var filterHandler = function(event) {
 
 			var filter = event.target;
-			var filters = filter.closest('[data-element-filters]');
+			var filters = filter.closest('['+settings.attributes.filters+']');
 			if (!filters) return;
 
 			event.preventDefault();
@@ -124,11 +179,32 @@ var ElementFilters = (function() {
 				}
 		    }
 
-			dom.search.value = (filter.value + ' ' + searchValue).trim();
+			dom.search.value = (filter.value + ' ' + searchValue).replace(/  +/g, ' ').trim();
 			tiggerChangeEvent(dom.search);
 
 		};
 
+		var searchHandler = function(event) {
+
+			var search = event.target;
+			if (!search.closest('.search')) return;
+
+			console.log('SEARCH CHANGE');
+
+
+			// event.preventDefault();
+
+			// var searchValue = dom.search.value.trim();
+			// for (var i = 0; i < filter.options.length; i++) {
+			// 	if(filter.options[i].value != '') {
+			// 		searchValue = searchValue.replace(filter.options[i].value, '');
+			// 	}
+		 //    }
+
+			// dom.search.value = (filter.value + ' ' + searchValue).replace(/  +/g, ' ').trim();
+			// tiggerChangeEvent(dom.search);
+
+		};
 
 		// Public Methods
 		// =========================================================================
@@ -165,21 +241,12 @@ var ElementFilters = (function() {
 				console.log('[ElementFilters][elementIndex]', elementIndexType, elementIndex);
 			}
 
-			// Store DOM
-			dom.holder = elementIndex.$toolbar[0];
-			dom.toolbar = elementIndex.$toolbarFlexContainer[0];
-			dom.search = elementIndex.$search[0];
-			dom.searchHolder = dom.search.closest('.search');
+			if(elementIndex.$toolbar[0].hasAttribute(settings.attributes.id)){
+				return;
+			};
 
 			initElementFilters();
-			dom.holder.addEventListener('change', filterHandler, false);
-
-			// https://craftcms.stackexchange.com/questions/25827/garnish-event-when-changing-category-group?rq=1
-			elementIndex.on('selectSource', function() {
-				updateElementFilters();
-			});
 			updateElementFilters();
-
 		};
 
 		api.init(options);

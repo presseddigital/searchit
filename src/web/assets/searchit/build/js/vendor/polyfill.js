@@ -41,6 +41,35 @@ if (!Element.prototype.closest) {
 }
 
 /**
+ * String.prototype.trim() polyfill
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim#Polyfill
+ */
+if (!String.prototype.trim) {
+	String.prototype.trim = function () {
+		return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
+	};
+}
+
+/**
+ * String.prototype.includes() polyfill
+ * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/includes#Polyfill
+ */
+if (!String.prototype.includes) {
+  String.prototype.includes = function(search, start) {
+    'use strict';
+    if (typeof start !== 'number') {
+      start = 0;
+    }
+
+    if (start + search.length > this.length) {
+      return false;
+    } else {
+      return this.indexOf(search, start) !== -1;
+    }
+  };
+}
+
+/**
  * ChildNode.before() polyfill
  */
 // from: https://github.com/jserz/js_piece/blob/master/DOM/ChildNode/before()/before().md
