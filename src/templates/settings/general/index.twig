@@ -3,6 +3,21 @@
 
 {% block content %}
 
+	{% set supported = craft.searchit.searchFilters.getSupportedElementTypes() %}
+	{{ d(supported) }}
+
+	{% set elementTypes = craft.app.getElements().getAllElementTypes() %}
+
+	{% for elementType in elementTypes %}
+
+		{{ d(elementType) }}
+		{% set sources = craft.app.getElementIndexes().getSources(elementType) %}
+		{{ d(sources) }}
+
+	{% endfor %}
+
+
+
     {# <h2>{{ "General Settings"|t('searchit') }}</h2> #}
 
  	<form action="" method="post" accept-charset="UTF-8">

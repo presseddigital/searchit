@@ -13,7 +13,10 @@ use craft\records\Section as SectionRecord;
 
 use craft\elements\Category;
 use craft\elements\Entry;
+use craft\elements\User;
+use craft\elements\Asset;
 
+use craft\commerce\elements\Product;
 
 use craft\commerce\records\ProductType as ProductTypeRecord;
 
@@ -23,9 +26,132 @@ class SearchFilters extends Component
     // =========================================================================
 
     private $_optionsByType;
+    private $_supportedElementTypes;
+    private $_supportedSourcesByElementType = [];
 
     // Public Methods
     // =========================================================================
+
+    public function getSupportedElementTypes()
+    {
+        if(!is_null($this->_supportedElementTypes))
+        {
+            return $this->_supportedElementTypes;
+        }
+
+        $types = [];
+
+        $types[User::class] = [
+            'class' => User::class,
+            'handle' => 'users',
+            'label' => Craft::t('searchit', 'Users'),
+            'sources' => $this->getSupportedSources(User::class),
+        ];
+
+        $types[Entry::class] = [
+            'class' => Entry::class,
+            'handle' => 'entries',
+            'label' => Craft::t('searchit', 'Entries'),
+            'sources' => $this->getSupportedSources(Entry::class),
+        ];
+
+        $types[Category::class] = [
+            'class' => Category::class,
+            'handle' => 'categories',
+            'label' => Craft::t('searchit', 'Categories'),
+            'sources' => $this->getSupportedSources(Category::class),
+        ];
+
+        $types[Asset::class] = [
+            'class' => Asset::class,
+            'handle' => 'assets',
+            'label' => Craft::t('searchit', 'Assets'),
+            'sources' => $this->getSupportedSources(Asset::class),
+        ];
+
+        if(Searchit::$commerceInstalled)
+        {
+            $types[Product::class] = [
+                'class' => Product::class,
+                'handle' => 'products',
+                'label' => Craft::t('searchit', 'Products'),
+                'sources' => $this->getSupportedSources(Product::class),
+            ];
+        }
+
+        $this->_supportedElementTypes = $types;
+        return $this->_supportedElementTypes;
+    }
+
+    public function getSupportedSources(string $elementType)
+    {
+        if(isset($this->_supportedSourcesByElementType[$elementType]))
+        {
+            return $this->_supportedSourcesByElementType[$elementType];
+        }
+
+        $sources = [];
+        $allSources = Craft::$app->getElementIndexes()->getSources($elementType);
+        if($allSources)
+        {
+            foreach ($allSources as $source)
+            {
+                if($source['key'] ?? false)
+                {
+                    $skip = false;
+                    switch($elementType)
+                    {
+                        case(Entry::class):
+                            $skip = strpos($source['key'], 'section:') === false;
+                            break;
+                        case(User::class):
+                            $skip = $source['key'] == '*';
+                            break;
+                    }
+
+                    if($skip)
+                    {
+                        continue;
+                    }
+
+                    $sources[$source['key']] = [
+                        'label' => $source['label'],
+                        'key' => $source['key'],
+                        'handle' => str_replace(':', '', $source['key']),
+                    ];
+                }
+            }
+        }
+
+        $this->_supportedSourcesByElementType[$elementType] = $sources;
+        return $this->_supportedSourcesByElementType[$elementType];
+    }
+
+    public function getNavItems()
+    {
+        $items = [];
+
+        foreach ($this->getSupportedElementTypes() as $elementType)
+        {
+            $items[$elementType['handle']] = [ 'heading' => $elementType['label'] ];
+            $items['filters/'.$elementType['handle'].'/global'] = [ 'title' => Craft::t('searchit', 'Global')  ];
+            if($elementType['sources'])
+            {
+                foreach ($elementType['sources'] as $source)
+                {
+                    $items['filters/'.$elementType['handle'].'/'.$source['handle']] = [ 'title' => $source['label'] ];
+                }
+            }
+        }
+
+        $items['general'] = [ 'heading' => Craft::t('searchit', 'General') ];
+        $items['settings/general'] = [ 'title' => Craft::t('searchit', 'Settings') ];
+        $items['about'] = [ 'title' => Craft::t('searchit', 'About') ];
+
+        return $items;
+    }
+
+
 
     public function getActiveSearchFiltersArray(string $type = null)
     {
@@ -291,7 +417,7 @@ class SearchFilters extends Component
 
 
             case 'products':
-                if (Searchit::$isCommerceInstalled)
+                if (Searchit::$commerceInstalled)
                 {
                     $productTypes = ProductTypeRecord::find()
                         ->select([

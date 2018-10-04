@@ -1,6 +1,7 @@
 <?php
 namespace fruitstudios\searchit\plugin;
 
+use Craft;
 use fruitstudios\searchit\services\SearchFilters;
 
 trait Services

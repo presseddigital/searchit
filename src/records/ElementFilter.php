@@ -1,5 +1,5 @@
 <?php
-namespace fruitstudios\colorit\records;
+namespace fruitstudios\searchit\records;
 
 use craft\db\ActiveRecord;
 use yii\db\ActiveQueryInterface;
@@ -15,9 +15,8 @@ class ElementFilter extends ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'type'], 'required'],
-            [['type'], 'string'],
-            [['name'], 'string', 'max' => 255],
+            [['elementType', 'source', 'name', 'type'], 'string'],
+            [['elementType', 'source', 'name', 'type'], 'required'],
         ];
     }
 
@@ -27,7 +26,7 @@ class ElementFilter extends ActiveRecord
      */
     public static function tableName(): string
     {
-        return '{{%searchit_element_filters}}';
+        return '{{%searchit_elementfilters}}';
     }
 
 }

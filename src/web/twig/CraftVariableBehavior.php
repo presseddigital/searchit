@@ -16,5 +16,4 @@ class CraftVariableBehavior extends Behavior
         // Point `craft.searchit` to the craft\searchit\Plugin instance
         $this->searchit = Searchit::getInstance();
     }
-
 }
