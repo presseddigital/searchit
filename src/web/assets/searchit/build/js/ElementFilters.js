@@ -117,8 +117,6 @@ var ElementFilters = (function() {
 
 		var checkElementFilters = function() {
 
-			console.log('elemens up');
-
 			if(dom.toolbar && elementIndex) {
 				var searchValue = dom.search.value;
 				var activeFilters = getActiveFilters();
@@ -181,28 +179,6 @@ var ElementFilters = (function() {
 
 			dom.search.value = (filter.value + ' ' + searchValue).replace(/  +/g, ' ').trim();
 			tiggerChangeEvent(dom.search);
-
-		};
-
-		var searchHandler = function(event) {
-
-			var search = event.target;
-			if (!search.closest('.search')) return;
-
-			console.log('SEARCH CHANGE');
-
-
-			// event.preventDefault();
-
-			// var searchValue = dom.search.value.trim();
-			// for (var i = 0; i < filter.options.length; i++) {
-			// 	if(filter.options[i].value != '') {
-			// 		searchValue = searchValue.replace(filter.options[i].value, '');
-			// 	}
-		 //    }
-
-			// dom.search.value = (filter.value + ' ' + searchValue).replace(/  +/g, ' ').trim();
-			// tiggerChangeEvent(dom.search);
 
 		};
 
