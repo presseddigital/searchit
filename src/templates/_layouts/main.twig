@@ -14,7 +14,7 @@
     'settings/general': { title: "General"|t('searchit') },
 }|filter %} #}
 
-{% set navItems = craft.searchit.searchfilters.navItems %}
+{% set navItems = craft.searchit.cp.nav() %}
 
 {% set selectedItemHandle = selectedItem ?? craft.app.request.getSegment(2)~(craft.app.request.getSegment(3) ? '/'~craft.app.request.getSegment(3))~(craft.app.request.getSegment(4) ? '/'~craft.app.request.getSegment(4)) %}
 
