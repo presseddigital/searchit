@@ -93,7 +93,7 @@ class Searchit extends Plugin
 
         Craft::info(Craft::t('searchit', '{name} plugin loaded', ['name' => $this->name]), __METHOD__);
 
-        $this->initSearchFilters();
+        $this->initElementFilters();
     }
 
     public function beforeInstall(): bool
@@ -125,7 +125,7 @@ class Searchit extends Plugin
         return self::$commerceInstalled;
     }
 
-    public function initSearchFilters()
+    public function initElementFilters()
     {
         $request = Craft::$app->getRequest();
         if($request->isCpRequest)
@@ -133,7 +133,7 @@ class Searchit extends Plugin
             $general = Craft::$app->getConfig()->getGeneral();
             $js = [
                 'id' => StringHelper::UUID(),
-                'filters' => Searchit::$plugin->getSearchFilters()->getActiveSearchFiltersArray(),
+                'filters' => Searchit::$plugin->getElementFilters()->getActiveElementFiltersArray(),
                 'compactMode' => (bool) self::$settings->compactMode,
                 'debug' => $general->devMode,
                 'csrfTokenName' => $general->csrfTokenName,

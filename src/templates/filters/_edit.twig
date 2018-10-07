@@ -1,0 +1,86 @@
+{% extends "searchit/_layouts/main" %}
+{% import "_includes/forms" as forms %}
+
+{% set fullPageForm = true %}
+
+{% block content %}
+
+    <input type="hidden" name="action" value="searchit/element-filters/save">
+
+    <p>Filter Form HEre</p>
+
+    {{ d(elementFilter) }}
+{#
+    {% if not isNewPreset %}
+    	<input type="hidden" name="presetId" value="{{ preset.id }}">
+        <input type="hidden" name="type" value="{{ preset.type }}">
+    {% endif %}
+
+    {{ redirectInput('colorit/settings/presets') }}
+    {{ csrfInput() }}
+
+    {{ forms.textField({
+        label: 'Preset Name'|t('colorit'),
+        instructions: 'What the preset will be called in the field creation.'|t('colorit'),
+        id: 'name',
+        name: 'name',
+        placeholder: 'e.g. Brand Colors',
+        value: preset.name ?? '',
+        errors: preset.getErrors('name') ?? false,
+        first: true
+    }) }}
+
+    {% if isNewPreset %}
+
+        {% if allPresetsTypes|length > 1 %}
+
+            {{ forms.selectField({
+                label: "Field Type"|t('app'),
+                instructions: "Which field do you want to create a template for?"|t('colorit'),
+                id: 'type',
+                name: 'type',
+                options: presetTypeOptions,
+                value: preset.type,
+                toggle: true
+            }) }}
+
+            <hr>
+
+        {% else %}
+
+            <input type="hidden" name="type" value="{{ allPresetsTypes[0] }}">
+
+        {% endif %}
+
+        {% for type in allPresetsTypes %}
+
+            {% set isCurrent = preset.type == type %}
+
+            <div id="{{ type|id }}"{% if not isCurrent %} class="hidden"{% endif %}>
+
+                {% namespace 'types['~type~']' %}
+
+                    {% set _preset = isCurrent ? preset : craft.colorit.presets.createPreset(type) %}
+                    {{ _preset.getFieldSettingsHtml()|raw }}
+
+                {% endnamespace %}
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        {% namespace 'types['~preset.type~']' %}
+
+            {{ preset.getFieldSettingsHtml()|raw }}
+
+        {% endnamespace %}
+
+    {% endif %} #}
+
+    <div class="buttons">
+        <input type="submit" class="btn submit" value="{{ 'Save'|t('colorit') }}">
+    </div>
+
+{% endblock %}

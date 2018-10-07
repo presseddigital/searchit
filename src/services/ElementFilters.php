@@ -2,6 +2,7 @@
 namespace fruitstudios\searchit\services;
 
 use fruitstudios\searchit\Searchit;
+use fruitstudios\searchit\helpers\ElementHelper;
 
 use Craft;
 use craft\base\Component;
@@ -20,17 +21,31 @@ use craft\commerce\elements\Product;
 
 use craft\commerce\records\ProductType as ProductTypeRecord;
 
-class SearchFilters extends Component
+class ElementFilters extends Component
 {
     // Properties
     // =========================================================================
 
     private $_optionsByType;
+
     private $_supportedElementTypes;
     private $_supportedSourcesByElementType = [];
 
     // Public Methods
     // =========================================================================
+
+    public function getSourceInfo(string $elementType, string $sourceKeyOrHandle)
+    {
+        $supportedSources = $this->getSupportedSources($elementType);
+        $handle = ElementHelper::sourceKeyAsHandle($sourceKeyOrHandle);
+        return $supportedSources[$sourceKeyOrHandle] ?? false;
+    }
+
+    public function getElementInfo(string $elementType)
+    {
+        $supportedElementTypes = $this->getSupportedElementTypes();
+        return $supportedElementTypes[$elementType] ?? false;
+    }
 
     public function getSupportedElementTypes()
     {
@@ -45,6 +60,7 @@ class SearchFilters extends Component
             'class' => User::class,
             'handle' => 'users',
             'label' => Craft::t('searchit', 'Users'),
+            'displayName' => Craft::t('searchit', 'User'),
             'sources' => $this->getSupportedSources(User::class),
         ];
 
@@ -52,6 +68,7 @@ class SearchFilters extends Component
             'class' => Entry::class,
             'handle' => 'entries',
             'label' => Craft::t('searchit', 'Entries'),
+            'displayName' => Craft::t('searchit', 'Entry'),
             'sources' => $this->getSupportedSources(Entry::class),
         ];
 
@@ -59,6 +76,7 @@ class SearchFilters extends Component
             'class' => Category::class,
             'handle' => 'categories',
             'label' => Craft::t('searchit', 'Categories'),
+            'displayName' => Craft::t('searchit', 'Category'),
             'sources' => $this->getSupportedSources(Category::class),
         ];
 
@@ -66,6 +84,7 @@ class SearchFilters extends Component
             'class' => Asset::class,
             'handle' => 'assets',
             'label' => Craft::t('searchit', 'Assets'),
+            'displayName' => Craft::t('searchit', 'Asset'),
             'sources' => $this->getSupportedSources(Asset::class),
         ];
 
@@ -75,6 +94,7 @@ class SearchFilters extends Component
                 'class' => Product::class,
                 'handle' => 'products',
                 'label' => Craft::t('searchit', 'Products'),
+                'displayName' => Craft::t('searchit', 'Product'),
                 'sources' => $this->getSupportedSources(Product::class),
             ];
         }
@@ -90,7 +110,11 @@ class SearchFilters extends Component
             return $this->_supportedSourcesByElementType[$elementType];
         }
 
-        $sources = [];
+        $sources['global'] = [
+            'label' => Craft::t('searchit', 'Global'),
+            'key' => 'global',
+            'handle' => 'global',
+        ];
         $allSources = Craft::$app->getElementIndexes()->getSources($elementType);
         if($allSources)
         {
@@ -98,6 +122,7 @@ class SearchFilters extends Component
             {
                 if($source['key'] ?? false)
                 {
+                    $handle = ElementHelper::sourceKeyAsHandle($source['key']);
                     $skip = false;
                     switch($elementType)
                     {
@@ -114,10 +139,10 @@ class SearchFilters extends Component
                         continue;
                     }
 
-                    $sources[$source['key']] = [
+                    $sources[$handle] = [
                         'label' => $source['label'],
                         'key' => $source['key'],
-                        'handle' => str_replace(':', '', $source['key']),
+                        'handle' => $handle,
                     ];
                 }
             }
@@ -127,7 +152,19 @@ class SearchFilters extends Component
         return $this->_supportedSourcesByElementType[$elementType];
     }
 
-    public function getActiveSearchFiltersArray(string $type = null)
+    public function getElementFiltersByType(string $elementType, string $source)
+    {
+        return $this->_createElementFilterQuery()
+            ->where([
+                'elementType' => $elementType,
+                'source' => $source
+            ])
+            ->all();
+    }
+
+
+
+    public function getActiveElementFiltersArray(string $type = null)
     {
         $settings = Searchit::$plugin->getSettings();
         $filters = [];
@@ -428,15 +465,18 @@ class SearchFilters extends Component
     // Private Methods
     // =========================================================================
 
-    // private function _createSearchFilterQuery(): Query
-    // {
-    //     return (new Query())
-    //         ->select([
-    //             'id',
-    //             'name',
-    //             'type',
-    //             'settings',
-    //         ])
-    //         ->from(['{{%searchit_fieldtemplates}}']);
-    // }
+    private function _createElementFilterQuery(): Query
+    {
+        return (new Query())
+            ->select([
+                'id',
+                'elementType',
+                'source',
+                'name',
+                'type',
+                'settings',
+                'sortOrder',
+            ])
+            ->from(['{{%searchit_elementfilters}}']);
+    }
 }

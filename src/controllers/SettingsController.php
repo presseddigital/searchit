@@ -20,12 +20,4 @@ class SettingsController extends Controller
             'settings' => Searchit::$settings,
         ]);
     }
-
-    public function actionFilters($type)
-    {
-        return $this->renderTemplate('searchit/settings/filters', [
-        	'type' => $type,
-        	'settings' => Searchit::$settings,
-        ]);
-    }
 }

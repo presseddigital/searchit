@@ -3,7 +3,7 @@ namespace fruitstudios\searchit\plugin;
 
 use Craft;
 use fruitstudios\searchit\services\Cp;
-use fruitstudios\searchit\services\SearchFilters;
+use fruitstudios\searchit\services\ElementFilters;
 
 trait Services
 {
@@ -15,9 +15,9 @@ trait Services
         return $this->get('cp');
     }
 
-    public function getSearchFilters(): SearchFilters
+    public function getElementFilters(): ElementFilters
     {
-        return $this->get('searchFilters');
+        return $this->get('elementFilters');
     }
 
     // Private Methods
@@ -27,7 +27,7 @@ trait Services
     {
         $this->setComponents([
             'cp' => Cp::class,
-            'searchFilters' => SearchFilters::class,
+            'elementFilters' => ElementFilters::class,
         ]);
     }
 }

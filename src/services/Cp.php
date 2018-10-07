@@ -18,7 +18,7 @@ class Cp extends Component
     {
         $items = [];
 
-        foreach (Searchit::$plugin->getSearchFilters()->getSupportedElementTypes() as $elementType)
+        foreach (Searchit::$plugin->getElementFilters()->getSupportedElementTypes() as $elementType)
         {
             $items[$elementType['handle']] = [ 'heading' => $elementType['label'] ];
             $items['filters/'.$elementType['handle'].'/global'] = [ 'title' => Craft::t('searchit', 'Global')  ];

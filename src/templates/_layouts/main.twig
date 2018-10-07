@@ -2,18 +2,6 @@
 
 {% set title = "Searchit"|t('searchit') %}
 
-{# {% set navItems = {
-    'about': { title: "About"|t('searchit') },
-    'filters': { heading: "Filters"|t('searchit') },
-    'settings/filters/entries': { title: "Entries"|t('searchit') },
-    'settings/filters/users': { title: "Users"|t('searchit') },
-    'settings/filters/categories': { title: "Categories"|t('searchit') },
-    'settings/filters/assets': { title: "Assets"|t('searchit') },
-    'settings/filters/products': (craft.searchit.isCommerceInstalled ? { title: "Products"|t('searchit') } : null),
-    'settings': { heading: "Settings"|t('searchit') },
-    'settings/general': { title: "General"|t('searchit') },
-}|filter %} #}
-
 {% set navItems = craft.searchit.cp.nav() %}
 
 {% set selectedItemHandle = selectedItem ?? craft.app.request.getSegment(2)~(craft.app.request.getSegment(3) ? '/'~craft.app.request.getSegment(3))~(craft.app.request.getSegment(4) ? '/'~craft.app.request.getSegment(4)) %}

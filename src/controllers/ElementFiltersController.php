@@ -1,8 +1,9 @@
 <?php
-namespace fruitstudios\colorit\controllers;
+namespace fruitstudios\searchit\controllers;
 
-use fruitstudios\colorit\Colorit;
-use fruitstudios\colorit\models\Preset;
+use fruitstudios\searchit\Searchit;
+use fruitstudios\searchit\helpers\ElementHelper;
+use fruitstudios\searchit\models\ElementFilter;
 
 use Craft;
 use craft\web\Controller;
@@ -10,57 +11,59 @@ use craft\helpers\StringHelper;
 
 use yii\web\Response;
 
-class PresetsController extends Controller
+class ElementFiltersController extends Controller
 {
     // Public Methods
     // =========================================================================
 
-    public function actionIndex(): Response
+    public function actionIndex(string $elementTypeHandle, string $sourceHandle): Response
     {
-        $presets = Colorit::$plugin->getPresets()->getAllPresets();
+        $elementType = ElementHelper::getElementTypeByHandle($elementTypeHandle);
+        $element = Searchit::$plugin->getElementFilters()->getElementInfo($elementType);
+        $source = Searchit::$plugin->getElementFilters()->getSourceInfo($elementType, $sourceHandle);
+        $elementFilters = Searchit::$plugin->getElementFilters()->getElementFiltersByType($elementType, $sourceHandle);
 
-        return $this->renderTemplate('colorit/settings/presets/index', compact('presets'));
+        return $this->renderTemplate('searchit/filters/index', compact(
+            'elementType',
+            'element',
+            'source',
+            'elementFilters'
+        ));
     }
 
-    public function actionEdit(int $presetId = null, Preset $preset = null): Response
+    public function actionEdit(string $elementTypeHandle, string $sourceHandle, int $elementFilterId = null, ElementFilter $elementFilter = null): Response
     {
-        if (!$preset)
+        if (!$elementFilter)
         {
-            if ($presetId)
+            if ($elementFilterId)
             {
-                $preset = Colorit::$plugin->getPresets()->getPresetById($presetId);
-                if (!$preset)
+                $elementFilter = Searchit::$plugin->getElementFilters()->getElementFilterById($elementFilterId);
+                if (!$elementFilter)
                 {
                     throw new HttpException(404);
                 }
             }
             else
             {
-                $preset = new Preset();
+                $elementFilter = new ElementFilter();
+
+                $elementType = ElementHelper::getElementTypeByHandle($elementTypeHandle);
+                $source = Searchit::$plugin->getElementFilters()->getSourceInfo($elementType, $sourceHandle);
+                if (!$elementType || !$source)
+                {
+                    throw new HttpException(404);
+                }
+
+                $elementFilter->elementType = $elementType;
+                $elementFilter->source = $source['key'];
             }
         }
 
-        $isNewPreset = !$preset->id;
+        $isNewElementFilter = !$elementFilter->id;
 
-        $allPresetsTypes = Colorit::$plugin->getPresets()->getAllPresetTypes();
-        $presetTypeOptions = [];
-        foreach ($allPresetsTypes as $class) {
-            $presetTypeOptions[] = [
-                'value' => $class,
-                'label' => $class::displayName(),
-            ];
-        }
-
-        if($isNewPreset && !$preset->type)
-        {
-            $preset->type = $allPresetsTypes[0];
-        }
-
-        return $this->renderTemplate('colorit/settings/presets/_edit', [
-            'isNewPreset' => $isNewPreset,
-            'preset' => $preset,
-            'allPresetsTypes' => $allPresetsTypes,
-            'presetTypeOptions' => $presetTypeOptions,
+        return $this->renderTemplate('searchit/filters/_edit', [
+            'isNewElementFilter' => $isNewElementFilter,
+            'elementFilter' => $elementFilter,
         ]);
     }
 
@@ -80,7 +83,7 @@ class PresetsController extends Controller
         ]);
 
         if (!Colorit::$plugin->getPresets()->savePreset($preset)) {
-            Craft::$app->getSession()->setError(Craft::t('colorit', 'Couldn’t save preset.'));
+            Craft::$app->getSession()->setError(Craft::t('searchit', 'Couldn’t save preset.'));
 
             // Send the plugin back to the template
             Craft::$app->getUrlManager()->setRouteParams([
@@ -90,7 +93,7 @@ class PresetsController extends Controller
             return null;
         }
 
-        Craft::$app->getSession()->setNotice(Craft::t('colorit', 'Field template saved.'));
+        Craft::$app->getSession()->setNotice(Craft::t('searchit', 'Field template saved.'));
 
         return $this->redirectToPostedUrl();
     }
@@ -106,7 +109,7 @@ class PresetsController extends Controller
         {
             return $this->asJson(['success' => true]);
         }
-        return $this->asErrorJson(Craft::t('colorit', 'Could not delete preset'));
+        return $this->asErrorJson(Craft::t('searchit', 'Could not delete preset'));
     }
 
     // Private Methods

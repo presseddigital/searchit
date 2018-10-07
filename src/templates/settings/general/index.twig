@@ -3,7 +3,7 @@
 
 {% block content %}
 
-	{% set supported = craft.searchit.searchFilters.getSupportedElementTypes() %}
+	{% set supported = craft.searchit.elementFilters.getSupportedElementTypes() %}
 	{{ d(supported) }}
 
 	{% set elementTypes = craft.app.getElements().getAllElementTypes() %}

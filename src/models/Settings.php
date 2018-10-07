@@ -60,7 +60,7 @@ class Settings extends Model
     public function getFilterSettingsHtml(string $type)
     {
         $html = '';
-        $filterOptions = Searchit::$plugin->getSearchFilters()->getOptionsByType($type);
+        $filterOptions = Searchit::$plugin->getElementFilters()->getOptionsByType($type);
         if($filterOptions)
         {
             foreach ($filterOptions as $filterOption)
@@ -87,7 +87,7 @@ class Settings extends Model
             return $this->_filterSelects[$type][$key];
         }
 
-        $elementName = Searchit::$plugin->getSearchFilters()->getElementNameByType($type);
+        $elementName = Searchit::$plugin->getElementFilters()->getElementNameByType($type);
         $settings = $this->$type ?? false;
         if(!($settings['enabled'] ?? false))
         {
@@ -123,7 +123,7 @@ class Settings extends Model
         $this->_filterSelects[$type][$key] = Craft::$app->getView()->renderTemplateMacro('_includes/forms', 'select', [
             [
                 'id' => '',
-                'name' => 'searchFilters',
+                'name' => 'elementFilters',
                 'options' => $options,
             ]
         ]);
