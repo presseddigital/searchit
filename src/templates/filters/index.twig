@@ -5,6 +5,8 @@
 
 	<h2>{{ source.label }} {{ element.displayName }} {{ 'Filters'|t('searchit') }}</h2>
 
+	<p>Blub descibing list of filters</p>
+
 	{#
 	<div id="no-elementFilters"{% if elementFilters|length %} class="hidden"{% endif %}>
 	    <p>{{ "No filters exist yet."|t('searchit') }}</p>
@@ -12,6 +14,10 @@
 	#}
 
 	{% if elementFilters|length %}
+
+		{% if source.handle != 'global' %}
+			<p>Show an ajax lightswitch hooked up to settings to determine if this element / source combo should also display the global filters</p>
+		{% endif %}
 
         <table id="elementFilters" class="data fullwidth collapsible">
             <thead>
