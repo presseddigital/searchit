@@ -54,7 +54,7 @@ class Install extends Migration
                     'elementType' => $this->string()->notNull(),
                     'source' => $this->string()->notNull(),
                     'name' => $this->string()->notNull(),
-                    'type' => $this->enum('type', ['custom', 'json', 'advanced'])->notNull()->defaultValue('custom'),
+                    'type' => $this->enum('type', ['custom', 'dynamic', 'advanced'])->notNull()->defaultValue('custom'),
                     'settings' => $this->text(),
                     'sortOrder' => $this->smallInteger()->unsigned(),
                     'dateCreated' => $this->dateTime()->notNull(),

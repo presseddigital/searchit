@@ -18,8 +18,9 @@ class ElementFilter extends Model
     public $elementType;
     public $source = '*';
     public $name;
-    public $type = 'custom'; // custom, json, advanced
+    public $type = 'custom'; // custom, dynamic, advanced
     public $settings;
+    public $sortOrder;
 
     // Public Methods
     // =========================================================================
@@ -36,11 +37,36 @@ class ElementFilter extends Model
 
     public function validateSettings()
     {
+
+
         switch ($this->type)
         {
             case 'custom':
                 break;
-            case 'json':
+            case 'dynamic':
+
+                if(empty($this->settings))
+                {
+                    $this->addError('settings', [Craft::t('This is required')]);
+                }
+
+
+                break;
+            case 'advanced':
+                break;
+        }
+
+    }
+
+    public function getSettingsAsOptions()
+    {
+        switch ($this->type)
+        {
+            case 'custom':
+                return is_string($this->settings) ? Json::decodeIfJson($this->settings) : [];
+                break;
+            case 'dynamic':
+
                 break;
             case 'advanced':
                 break;
@@ -50,7 +76,10 @@ class ElementFilter extends Model
 
     public function getPreview()
     {
+
+
         return '<p>Select</p>';
     }
+
 
 }

@@ -38,7 +38,7 @@
             <tbody>
                 {% for elementFilter in elementFilters %}
                     <tr data-id="{{ elementFilter.id }}" data-name="{{ elementFilter.name }}">
-                        <th scope="row" data-title="{{ 'Name'|t('searchit') }}"><a href="{{ url('searchit/filters/'~elementFilter.id) }}">{{ elementFilter.name }}</a></th>
+                        <th scope="row" data-title="{{ 'Name'|t('searchit') }}"><a href="{{ url('searchit/filters/'~element.handle~'/'~source.handle~'/'~elementFilter.id) }}">{{ elementFilter.name }}</a></th>
                         <td data-title="{{ 'Type'|t('searchit') }}">{{ elementFilter.type|ucfirst }}</td>
                         <td data-title="{{ 'Preview'|t('searchit') }}">{{ elementFilter.getPreview()|raw }}</td>
                         <td class="thin"><a class="delete icon" title="{{ 'Delete'|t('searchit') }}" role="button"></a></td>

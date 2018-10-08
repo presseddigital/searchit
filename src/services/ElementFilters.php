@@ -2,6 +2,8 @@
 namespace fruitstudios\searchit\services;
 
 use fruitstudios\searchit\Searchit;
+use fruitstudios\searchit\models\ElementFilter;
+use fruitstudios\searchit\records\ElementFilter as ElementFilterRecord;
 use fruitstudios\searchit\helpers\ElementHelper;
 
 use Craft;
@@ -30,6 +32,11 @@ class ElementFilters extends Component
 
     private $_supportedElementTypes;
     private $_supportedSourcesByElementType = [];
+
+    private $_fetchedAllElementFilters;
+    private $_elementFiltersById = [];
+    private $_elementFiltersByType = [];
+    private $_elementFiltersBySource = [];
 
     // Public Methods
     // =========================================================================
@@ -112,7 +119,7 @@ class ElementFilters extends Component
 
         $sources['global'] = [
             'label' => Craft::t('searchit', 'Global'),
-            'key' => 'global',
+            'key' => '*',
             'handle' => 'global',
         ];
         $allSources = Craft::$app->getElementIndexes()->getSources($elementType);
@@ -152,17 +159,45 @@ class ElementFilters extends Component
         return $this->_supportedSourcesByElementType[$elementType];
     }
 
-    public function getElementFiltersByType(string $elementType, string $source)
+    public function getElementFilters(string $elementType = null, string $source = null)
     {
-        return $this->_createElementFilterQuery()
-            ->where([
+        if($this->_fetchedAllElementFilters)
+        {
+            return $this->_elementFiltersBySource[$elementType][$source] ?? $this->_elementFiltersByType[$elementType] ?? $this->_elementFiltersById;
+        }
+
+        $results = $this->_createElementFilterQuery()
+            ->where(array_filter([
                 'elementType' => $elementType,
                 'source' => $source
-            ])
+            ]))
             ->all();
+
+        if($results)
+        {
+            foreach($results as $result)
+            {
+                $elementFilter = new ElementFilter($result);
+                $this->_elementFiltersById[$result['id']] = $elementFilter;
+                $this->_elementFiltersByType[$result['elementType']][$result['id']] = $elementFilter;
+                $this->_elementFiltersBySource[$result['elementType']][$result['source']][$result['id']] = $elementFilter;
+            }
+        }
+
+         return $this->_elementFiltersBySource[$elementType][$source] ?? $this->_elementFiltersByType[$elementType] ?? $this->_elementFiltersById;
     }
 
+    public function getAllElementFilters()
+    {
+        if($this->_fetchedAllElementFilters)
+        {
+            return $this->_elementFiltersById;
+        }
 
+        $this->getElementFilters();
+        $this->_fetchedAllElementFilters = true;
+        return $this->_elementFiltersById;
+    }
 
     public function getActiveElementFiltersArray(string $type = null)
     {
@@ -461,6 +496,73 @@ class ElementFilters extends Component
         return $this->_optionsByType[$type] ?? [];
     }
 
+
+
+
+    public function getElementFilterById($id)
+    {
+        if($this->_fetchedAllElementFilters || isset($this->_elementFiltersById[$id]))
+        {
+            return $this->_elementFiltersById[$id] ?? null;
+        }
+
+        $result = $this->_createElementFilterQuery()
+            ->where(['id' => $id])
+            ->one();
+
+        if (!$result)
+        {
+            return null;
+        }
+        return $this->_elementFiltersById[$id] = new ElementFilter($result);
+    }
+
+    public function saveElementFilter(ElementFilter $model, bool $runValidation = true): bool
+    {
+        if ($model->id)
+        {
+            $record = ElementFilterRecord::findOne($model->id);
+            if (!$record)
+            {
+                throw new Exception(Craft::t('searchit', 'No element filter exists with the ID “{id}”', ['id' => $model->id]));
+            }
+        }
+        else
+        {
+            $record = new ElementFilterRecord();
+        }
+
+        if ($runValidation && !$model->validate())
+        {
+            Craft::info('Element filter not saved due to validation error.', __METHOD__);
+            return false;
+        }
+
+        $record->elementType = $model->elementType;
+        $record->source = $model->source;
+        $record->name = $model->name;
+        $record->type = $model->type;
+        $record->settings = $model->settings;
+        $record->sortOrder = $model->sortOrder;
+
+        // Save it!
+        $record->save(false);
+
+        // Now that we have a record ID, save it on the model
+        $model->id = $record->id;
+
+        return true;
+    }
+
+    public function deleteElementFilterById($id): bool
+    {
+        $record = ElementFilterRecord::findOne($id);
+        if ($record)
+        {
+            return (bool)$record->delete();
+        }
+        return false;
+    }
 
     // Private Methods
     // =========================================================================

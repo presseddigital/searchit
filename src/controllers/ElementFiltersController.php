@@ -21,7 +21,7 @@ class ElementFiltersController extends Controller
         $elementType = ElementHelper::getElementTypeByHandle($elementTypeHandle);
         $element = Searchit::$plugin->getElementFilters()->getElementInfo($elementType);
         $source = Searchit::$plugin->getElementFilters()->getSourceInfo($elementType, $sourceHandle);
-        $elementFilters = Searchit::$plugin->getElementFilters()->getElementFiltersByType($elementType, $sourceHandle);
+        $elementFilters = Searchit::$plugin->getElementFilters()->getElementFilters($elementType, $sourceHandle);
 
         return $this->renderTemplate('searchit/filters/index', compact(
             'elementTypeHandle',
@@ -35,6 +35,14 @@ class ElementFiltersController extends Controller
 
     public function actionEdit(string $elementTypeHandle, string $sourceHandle, int $elementFilterId = null, ElementFilter $elementFilter = null): Response
     {
+        $elementType = ElementHelper::getElementTypeByHandle($elementTypeHandle);
+        $element = Searchit::$plugin->getElementFilters()->getElementInfo($elementType);
+        $source = Searchit::$plugin->getElementFilters()->getSourceInfo($elementType, $sourceHandle);
+        if (!$elementType || !$source)
+        {
+            throw new HttpException(404);
+        }
+
         if (!$elementFilter)
         {
             if ($elementFilterId)
@@ -48,14 +56,6 @@ class ElementFiltersController extends Controller
             else
             {
                 $elementFilter = new ElementFilter();
-
-                $elementType = ElementHelper::getElementTypeByHandle($elementTypeHandle);
-                $source = Searchit::$plugin->getElementFilters()->getSourceInfo($elementType, $sourceHandle);
-                if (!$elementType || !$source)
-                {
-                    throw new HttpException(404);
-                }
-
                 $elementFilter->elementType = $elementType;
                 $elementFilter->source = $source['key'];
             }
@@ -66,6 +66,9 @@ class ElementFiltersController extends Controller
         return $this->renderTemplate('searchit/filters/_edit', compact(
             'elementTypeHandle',
             'sourceHandle',
+            'elementType',
+            'element',
+            'source',
             'isNewElementFilter',
             'elementFilter'
         ));
@@ -75,29 +78,35 @@ class ElementFiltersController extends Controller
     {
         $this->requirePostRequest();
 
-        $presetsService = Colorit::$plugin->getPresets();
+        $elementFiltersService = Searchit::$plugin->getElementFilters();
         $request = Craft::$app->getRequest();
+
+        $elementType = $request->getRequiredBodyParam('elementType');
+        $source = $request->getRequiredBodyParam('source');
         $type = $request->getRequiredBodyParam('type');
 
-        $preset = $presetsService->createPreset([
-            'type' => $type,
-            'id' => $request->getBodyParam('presetId'),
+        $elementFilter = new ElementFilter([
+            'id' => $request->getBodyParam('elementFilterId'),
+            'elementType' => $elementType,
+            'source' => $source,
             'name' => $request->getBodyParam('name'),
-            'settings' => $request->getBodyParam('types.'.$type),
+            'type' => $type,
+            'settings' => $request->getBodyParam('settings.'.$type),
+            'sortOrder' => $request->getBodyParam('sortOrder'),
         ]);
 
-        if (!Colorit::$plugin->getPresets()->savePreset($preset)) {
-            Craft::$app->getSession()->setError(Craft::t('searchit', 'Couldn’t save preset.'));
+        if (!$elementFiltersService->saveElementFilter($elementFilter)) {
+            Craft::$app->getSession()->setError(Craft::t('searchit', 'Couldn’t save element filter.'));
 
             // Send the plugin back to the template
             Craft::$app->getUrlManager()->setRouteParams([
-                'preset' => $preset
+                'elementFilter' => $elementFilter
             ]);
 
             return null;
         }
 
-        Craft::$app->getSession()->setNotice(Craft::t('searchit', 'Field template saved.'));
+        Craft::$app->getSession()->setNotice(Craft::t('searchit', 'Element filter saved.'));
 
         return $this->redirectToPostedUrl();
     }
@@ -109,11 +118,11 @@ class ElementFiltersController extends Controller
 
         $id = Craft::$app->getRequest()->getRequiredBodyParam('id');
 
-        if (Colorit::$plugin->getPresets()->deletePresetById($id))
+        if (Searchit::$plugin->getElementFilters()->deleteElementFilterById($id))
         {
             return $this->asJson(['success' => true]);
         }
-        return $this->asErrorJson(Craft::t('searchit', 'Could not delete preset'));
+        return $this->asErrorJson(Craft::t('searchit', 'Could not delete filter'));
     }
 
     // Private Methods

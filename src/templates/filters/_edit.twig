@@ -5,25 +5,27 @@
 
 {% block content %}
 
-    {#
+
         {{ d(elementFilter.getErrors()) }}
         {{ d(elementFilter) }}
-    #}
+
     <input type="hidden" name="action" value="searchit/element-filters/save">
 
     {% if not isNewElementFilter %}
         <input type="hidden" name="elementFilterId" value="{{ elementFilter.id }}">
     {% endif %}
+    <input type="hidden" name="elementType" value="{{ elementType }}">
+    <input type="hidden" name="source" value="{{ source.key }}">
 
     {{ redirectInput('searchit/filters/'~elementTypeHandle~'/'~sourceHandle) }}
     {{ csrfInput() }}
 
     {{ forms.textField({
         label: 'Filter Name'|t('searchit'),
-        instructions: 'What the filter will be called.'|t('searchit'),
+        instructions: 'Give your filter a name. NB. Also used to head up your filter select.'|t('searchit'),
         id: 'name',
         name: 'name',
-        placeholder: 'By This',
+        placeholder: '',
         value: elementFilter.name ?? '',
         errors: elementFilter.getErrors('name') ?? false,
         first: true
@@ -31,13 +33,13 @@
 
     {{ forms.selectField({
         label: "Filter Type"|t('searchit'),
-        instructions: "Which typ of filter do you want to create?"|t('searchit'),
+        instructions: "Choose the type of filter to setup."|t('searchit'),
         id: 'type',
         name: 'type',
         options: {
-            custom: 'Custom',
-            json: 'JSON / Twig',
-            advanced: 'Advanced',
+            custom: 'Custom'|t('searchit'),
+            dynamic: 'Dynamic'|t('searchit'),
+            advanced: 'Advanced'|t('searchit'),
         },
         value: elementFilter.type,
         toggle: true
@@ -50,9 +52,9 @@
         {{ forms.editableTableField({
             id: 'customSettings',
             name: 'settings[custom]',
-            label: 'Options'|t('searchit'),
-            instructions: "Build you filter dropdown manually here"|t('searchit'),
-            rows: elementFilter.type == 'custom' ? (elementFilter.settings ?? []) : [],
+            label: 'Filter Options'|t('searchit'),
+            instructions: "Specify this filters dropdown options."|t('searchit'),
+            rows: elementFilter.type == 'custom' ? (elementFilter.settingsAsOptions ?? []) : [],
             textual: false,
             addRowLabel: 'Add filter'|t('searchit'),
             cols: {
@@ -71,20 +73,21 @@
 
     </div>
 
-    <div id="{{ 'json'|id }}" {% if elementFilter.type != 'json' %} class="hidden"{% endif %}>
+    <div id="{{ 'dynamic'|id }}" {% if elementFilter.type != 'dynamic' %} class="hidden"{% endif %}>
 
         {{ forms.textareaField({
-            id: 'jsonSettings',
-            name: 'settings[json]',
-            label: 'Options'|t('searchit'),
-            instructions: 'Use json and / or twig to define the filter options.'|t('searchit'),
+            id: 'dynamicSettings',
+            name: 'settings[dynamic]',
+            label: 'Filter Options'|t('searchit'),
+            instructions: 'Use json or twig to define this filters options.'|t('searchit'),
             rows: 7,
             class: 'code',
-            value: elementFilter.type == 'json' ? (elementFilter.settings ?? '') : '',
+            value: elementFilter.type == 'dynamic' ? (elementFilter.settings ?? '') : '',
         }) }}
 
         {% verbatim %}
-            <h3>Use JSON</h3>
+
+            <h3>JSON</h3>
             <p>
             <pre class="code">{ "value":"roomCategory: 1", "label":"Room 1" },
 { "value":"roomCategory: 2", "label":"Room 2" },
@@ -94,7 +97,7 @@
             </p>
 
 
-            <h3>Or Twig</h3>
+            <h3>Twig</h3>
             <p>
             <pre class="code">{% for category in craft.categories.group('rooms').all() %}
     { "value":"roomCategory: {{ category.id }}", "label":"{{ category.name|e }}" }{{ not loop.last ? ',' }}
@@ -102,7 +105,7 @@
         </pre>
             </p>
 
-            <h3>Or even a twig include</h3>
+            <h3>Twig Include</h3>
             <p>
             <pre class="code">{% include '_includes/filters/rooms' ignore missing %}
         </pre>
