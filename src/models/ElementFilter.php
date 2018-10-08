@@ -18,10 +18,8 @@ class ElementFilter extends Model
     public $elementType;
     public $source = '*';
     public $name;
-    public $type = 'custom'; // custom, json, special
-    public $custom;
-    public $json;
-	public $special;
+    public $type = 'custom'; // custom, json, advanced
+    public $settings;
 
     // Public Methods
     // =========================================================================
@@ -31,34 +29,28 @@ class ElementFilter extends Model
         $rules = parent::rules();
         $rules[] = [['elementType', 'source', 'name', 'type'], 'string'];
         $rules[] = [['elementType', 'source', 'name', 'type'], 'required'];
-        $rules[] = ['custom', 'validateCustom'];
-        $rules[] = ['json', 'validateJson'];
-        $rules[] = ['special', 'validateSpecial'];
+        $rules[] = ['settings', 'validateSettings'];
+
         return $rules;
     }
 
-    public function validateCustom()
+    public function validateSettings()
     {
-        if($this->type == 'custom')
+        switch ($this->type)
         {
-
+            case 'custom':
+                break;
+            case 'json':
+                break;
+            case 'advanced':
+                break;
         }
+
     }
 
-    public function validateJson()
+    public function getPreview()
     {
-        if($this->type == 'json')
-        {
-
-        }
-    }
-
-    public function validateSpecial()
-    {
-        if($this->type == 'special')
-        {
-
-        }
+        return '<p>Select</p>';
     }
 
 }

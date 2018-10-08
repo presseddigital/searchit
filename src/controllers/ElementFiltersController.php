@@ -24,6 +24,8 @@ class ElementFiltersController extends Controller
         $elementFilters = Searchit::$plugin->getElementFilters()->getElementFiltersByType($elementType, $sourceHandle);
 
         return $this->renderTemplate('searchit/filters/index', compact(
+            'elementTypeHandle',
+            'sourceHandle',
             'elementType',
             'element',
             'source',
@@ -61,10 +63,12 @@ class ElementFiltersController extends Controller
 
         $isNewElementFilter = !$elementFilter->id;
 
-        return $this->renderTemplate('searchit/filters/_edit', [
-            'isNewElementFilter' => $isNewElementFilter,
-            'elementFilter' => $elementFilter,
-        ]);
+        return $this->renderTemplate('searchit/filters/_edit', compact(
+            'elementTypeHandle',
+            'sourceHandle',
+            'isNewElementFilter',
+            'elementFilter'
+        ));
     }
 
     public function actionSave()

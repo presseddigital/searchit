@@ -5,82 +5,122 @@
 
 {% block content %}
 
+    {#
+        {{ d(elementFilter.getErrors()) }}
+        {{ d(elementFilter) }}
+    #}
     <input type="hidden" name="action" value="searchit/element-filters/save">
 
-    <p>Filter Form HEre</p>
-
-    {{ d(elementFilter) }}
-{#
-    {% if not isNewPreset %}
-    	<input type="hidden" name="presetId" value="{{ preset.id }}">
-        <input type="hidden" name="type" value="{{ preset.type }}">
+    {% if not isNewElementFilter %}
+        <input type="hidden" name="elementFilterId" value="{{ elementFilter.id }}">
     {% endif %}
 
-    {{ redirectInput('colorit/settings/presets') }}
+    {{ redirectInput('searchit/filters/'~elementTypeHandle~'/'~sourceHandle) }}
     {{ csrfInput() }}
 
     {{ forms.textField({
-        label: 'Preset Name'|t('colorit'),
-        instructions: 'What the preset will be called in the field creation.'|t('colorit'),
+        label: 'Filter Name'|t('searchit'),
+        instructions: 'What the filter will be called.'|t('searchit'),
         id: 'name',
         name: 'name',
-        placeholder: 'e.g. Brand Colors',
-        value: preset.name ?? '',
-        errors: preset.getErrors('name') ?? false,
+        placeholder: 'By This',
+        value: elementFilter.name ?? '',
+        errors: elementFilter.getErrors('name') ?? false,
         first: true
     }) }}
 
-    {% if isNewPreset %}
+    {{ forms.selectField({
+        label: "Filter Type"|t('searchit'),
+        instructions: "Which typ of filter do you want to create?"|t('searchit'),
+        id: 'type',
+        name: 'type',
+        options: {
+            custom: 'Custom',
+            json: 'JSON / Twig',
+            advanced: 'Advanced',
+        },
+        value: elementFilter.type,
+        toggle: true
+    }) }}
 
-        {% if allPresetsTypes|length > 1 %}
+    <hr>
 
-            {{ forms.selectField({
-                label: "Field Type"|t('app'),
-                instructions: "Which field do you want to create a template for?"|t('colorit'),
-                id: 'type',
-                name: 'type',
-                options: presetTypeOptions,
-                value: preset.type,
-                toggle: true
-            }) }}
+    <div id="{{ 'custom'|id }}" {% if elementFilter.type != 'custom' %} class="hidden"{% endif %}>
 
-            <hr>
+        {{ forms.editableTableField({
+            id: 'customSettings',
+            name: 'settings[custom]',
+            label: 'Options'|t('searchit'),
+            instructions: "Build you filter dropdown manually here"|t('searchit'),
+            rows: elementFilter.type == 'custom' ? (elementFilter.settings ?? []) : [],
+            textual: false,
+            addRowLabel: 'Add filter'|t('searchit'),
+            cols: {
+                name: {
+                    heading: 'Name'|t('searchit'),
+                    type: 'singleline',
+                    width: '30%',
+                },
+                filter: {
+                    heading: 'Filter'|t('searchit'),
+                    type: 'singleline',
+                }
+            },
+            errors: []
+        }) }}
 
-        {% else %}
+    </div>
 
-            <input type="hidden" name="type" value="{{ allPresetsTypes[0] }}">
+    <div id="{{ 'json'|id }}" {% if elementFilter.type != 'json' %} class="hidden"{% endif %}>
 
-        {% endif %}
+        {{ forms.textareaField({
+            id: 'jsonSettings',
+            name: 'settings[json]',
+            label: 'Options'|t('searchit'),
+            instructions: 'Use json and / or twig to define the filter options.'|t('searchit'),
+            rows: 7,
+            class: 'code',
+            value: elementFilter.type == 'json' ? (elementFilter.settings ?? '') : '',
+        }) }}
 
-        {% for type in allPresetsTypes %}
+        {% verbatim %}
+            <h3>Use JSON</h3>
+            <p>
+            <pre class="code">{ "value":"roomCategory: 1", "label":"Room 1" },
+{ "value":"roomCategory: 2", "label":"Room 2" },
+{ "value":"roomCategory: 3", "label":"Room 3" },
+{ "value":"roomCategory: 4", "label":"Room 4" }
+        </pre>
+            </p>
 
-            {% set isCurrent = preset.type == type %}
 
-            <div id="{{ type|id }}"{% if not isCurrent %} class="hidden"{% endif %}>
+            <h3>Or Twig</h3>
+            <p>
+            <pre class="code">{% for category in craft.categories.group('rooms').all() %}
+    { "value":"roomCategory: {{ category.id }}", "label":"{{ category.name|e }}" }{{ not loop.last ? ',' }}
+{% endfor %}
+        </pre>
+            </p>
 
-                {% namespace 'types['~type~']' %}
+            <h3>Or even a twig include</h3>
+            <p>
+            <pre class="code">{% include '_includes/filters/rooms' ignore missing %}
+        </pre>
+            </p>
 
-                    {% set _preset = isCurrent ? preset : craft.colorit.presets.createPreset(type) %}
-                    {{ _preset.getFieldSettingsHtml()|raw }}
+        {% endverbatim %}
 
-                {% endnamespace %}
+    </div>
 
-            </div>
+    <div id="{{ 'advanced'|id }}" {% if elementFilter.type != 'advanced' %} class="hidden"{% endif %}>
 
-        {% endfor %}
+        <p>We are still working on some super useful pre-defined advanced filters.</p>
+        <input type="hidden" name="settings[advanced]" value="">
 
-    {% else %}
-
-        {% namespace 'types['~preset.type~']' %}
-
-            {{ preset.getFieldSettingsHtml()|raw }}
-
-        {% endnamespace %}
-
-    {% endif %} #}
+    </div>
 
     <div class="buttons">
-        <input type="submit" class="btn submit" value="{{ 'Save'|t('colorit') }}">
+        <input type="submit" class="btn submit" value="{{ 'Save'|t('searchit') }}">
     </div>
 
 {% endblock %}

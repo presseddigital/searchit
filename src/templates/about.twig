@@ -1,6 +1,6 @@
 {% extends "searchit/_layouts/main" %}
 
-{% set config = craft.app.plugins.getPluginInfo('linkit') %}
+{% set config = craft.app.plugins.getPluginInfo('searchit') %}
 
 {% block content %}
 
@@ -8,16 +8,16 @@
         {{ svg(craft.app.plugins.getPluginIconSvg('searchit')) }}
     </div>
 
-    <h2>{{ "Thanks for using Searchit"|t('searchit') }}</h2>
+    <h2>{{ "Thanks for using {name}"|t('searchit', {
+        name: craft.searchit.name
+    }) }}</h2>
 
-    <p>Bit of useful info on searchit, key features, what it does etc etc</p>
+    <p>{{ 'Please report any issues through Github'|t('searchit') }}</p>
 
-    <p>Some links to the docs and changelog:</p>
-    <a class="btn" href="{{ craft.searchit.documentationUrl }}" target="_blank">{{ "Documentation" | t('searchit') }}</a>
-    <a class="btn" href="{{ craft.searchit.changelogUrl }}" target="_blank">{{ "Changelog" | t('searchit') }}</a>
+    <a class="btn btn-docs" href="{{ craft.searchit.documentationUrl }}" target="_blank">{{ "Documentation" | t('searchit') }}</a>
+    <a class="btn btn-docs" href="{{ craft.searchit.changelogUrl }}" target="_blank">{{ "Changelog" | t('searchit') }}</a>
+    <a class="btn btn-docs" href="{{ craft.searchit.GitHubUrl('/issues') }}" target="_blank">{{ "Issues" | t('searchit') }}</a>
 
-    <p>Please report any issues through github:</p>
-    <a class="btn" href="{{ craft.searchit.GitHubUrl('/issues') }}" target="_blank">{{ "Report an issue" | t('searchit') }}</a>
     <hr>
 
     <h2>{{ "Licence"|t('searchit') }}</h2>
@@ -37,5 +37,3 @@
     {% endif %}
 
 {% endblock %}
-
-

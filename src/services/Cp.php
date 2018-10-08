@@ -32,7 +32,7 @@ class Cp extends Component
         }
 
         $items['general'] = [ 'heading' => Craft::t('searchit', 'General') ];
-        $items['settings/general'] = [ 'title' => Craft::t('searchit', 'Settings') ];
+        $items['settings'] = [ 'title' => Craft::t('searchit', 'Settings') ];
         $items['about'] = [ 'title' => Craft::t('searchit', 'About') ];
 
         return $items;

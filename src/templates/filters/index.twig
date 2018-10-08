@@ -5,7 +5,14 @@
 
 	<h2>{{ source.label }} {{ element.displayName }} {{ 'Filters'|t('searchit') }}</h2>
 
-	<p>Blub descibing list of filters</p>
+	{% if source.handle == 'global' %}
+        <p>{{ 'Add filters which will optionally display in all element search toolbars.'|t('searchit') }}</p>
+    {% else %}
+        <p>{{ 'Add filters which will only display in the element search toolbar on the {element} {source} view.'|t('searchit', {
+            element: element.displayName,
+            source: source.label,
+        }) }}</p>
+    {% endif %}
 
 	{#
 	<div id="no-elementFilters"{% if elementFilters|length %} class="hidden"{% endif %}>
@@ -33,7 +40,7 @@
                     <tr data-id="{{ elementFilter.id }}" data-name="{{ elementFilter.name }}">
                         <th scope="row" data-title="{{ 'Name'|t('searchit') }}"><a href="{{ url('searchit/filters/'~elementFilter.id) }}">{{ elementFilter.name }}</a></th>
                         <td data-title="{{ 'Type'|t('searchit') }}">{{ elementFilter.type|ucfirst }}</td>
-                        <td data-title="{{ 'Preview'|t('searchit') }}">PREVIEW HERE</td>
+                        <td data-title="{{ 'Preview'|t('searchit') }}">{{ elementFilter.getPreview()|raw }}</td>
                         <td class="thin"><a class="delete icon" title="{{ 'Delete'|t('searchit') }}" role="button"></a></td>
                     </tr>
                 {% endfor %}
