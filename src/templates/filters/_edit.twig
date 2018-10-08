@@ -58,7 +58,7 @@
             textual: false,
             addRowLabel: 'Add filter'|t('searchit'),
             cols: {
-                name: {
+                label: {
                     heading: 'Name'|t('searchit'),
                     type: 'singleline',
                     width: '30%',
@@ -89,10 +89,10 @@
 
             <h3>JSON</h3>
             <p>
-            <pre class="code">{ "value":"roomCategory: 1", "label":"Room 1" },
-{ "value":"roomCategory: 2", "label":"Room 2" },
-{ "value":"roomCategory: 3", "label":"Room 3" },
-{ "value":"roomCategory: 4", "label":"Room 4" }
+            <pre class="code">{ "filter":"roomCategory: 1", "label":"Room 1" },
+{ "filter":"roomCategory: 2", "label":"Room 2" },
+{ "filter":"roomCategory: 3", "label":"Room 3" },
+{ "filter":"roomCategory: 4", "label":"Room 4" }
         </pre>
             </p>
 
@@ -100,7 +100,7 @@
             <h3>Twig</h3>
             <p>
             <pre class="code">{% for category in craft.categories.group('rooms').all() %}
-    { "value":"roomCategory: {{ category.id }}", "label":"{{ category.name|e }}" }{{ not loop.last ? ',' }}
+    { "filter":"roomCategory: {{ category.id }}", "label":"{{ category.name|e }}" }{{ not loop.last ? ',' }}
 {% endfor %}
         </pre>
             </p>

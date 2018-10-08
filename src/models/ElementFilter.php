@@ -37,8 +37,6 @@ class ElementFilter extends Model
 
     public function validateSettings()
     {
-
-
         switch ($this->type)
         {
             case 'custom':
@@ -66,9 +64,10 @@ class ElementFilter extends Model
                 return is_string($this->settings) ? Json::decodeIfJson($this->settings) : [];
                 break;
             case 'dynamic':
-
+                return Json::decode('[' . Craft::$app->getView()->renderString($this->settings) . ']', true);
                 break;
             case 'advanced':
+                return [];
                 break;
         }
 
@@ -76,9 +75,30 @@ class ElementFilter extends Model
 
     public function getPreview()
     {
+        $options = [
+            [
+                'label' => $this->name,
+                'value' => ''
+            ]
+        ];
 
+        $settingsAsOptions = $this->getSettingsAsOptions();
+        if ($settingsAsOptions)
+        {
+            foreach ($settingsAsOptions as $option)
+            {
+                $options[] = [
+                    'label' => $option['label'] ?? '',
+                    'value' => $option['filter'] ?? ''
+                ];
+            }
+        }
 
-        return '<p>Select</p>';
+        return Craft::$app->getView()->renderTemplateMacro('_includes/forms', 'select', [
+            [
+                'options' => $options,
+            ]
+        ]);
     }
 
 

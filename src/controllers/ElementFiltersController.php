@@ -21,7 +21,7 @@ class ElementFiltersController extends Controller
         $elementType = ElementHelper::getElementTypeByHandle($elementTypeHandle);
         $element = Searchit::$plugin->getElementFilters()->getElementInfo($elementType);
         $source = Searchit::$plugin->getElementFilters()->getSourceInfo($elementType, $sourceHandle);
-        $elementFilters = Searchit::$plugin->getElementFilters()->getElementFilters($elementType, $sourceHandle);
+        $elementFilters = Searchit::$plugin->getElementFilters()->getElementFilters($elementType, $source['key']);
 
         return $this->renderTemplate('searchit/filters/index', compact(
             'elementTypeHandle',
@@ -122,21 +122,7 @@ class ElementFiltersController extends Controller
         {
             return $this->asJson(['success' => true]);
         }
-        return $this->asErrorJson(Craft::t('searchit', 'Could not delete filter'));
-    }
-
-    // Private Methods
-    // =========================================================================
-
-    private function _getPresetModel(string $type, array $attributes = [])
-    {
-        try {
-            $preset = Craft::createObject($type);
-            return Craft::configure($preset, $attributes);
-        } catch(ErrorException $exception) {
-            $error = $exception->getMessage();
-            return false;
-        }
+        return $this->asErrorJson(Craft::t('searchit', 'Could not delete element filter'));
     }
 
 }

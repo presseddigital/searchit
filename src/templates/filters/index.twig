@@ -20,10 +20,25 @@
 	</div>
 	#}
 
+	<div class="elementindex" data-element-filter-preview-element-type="{{ elementType }}" data-element-filter-preview-source="{{ source.key }}">
+        {% include "_elements/indexcontainer" with {
+            showSiteMenu: false,
+            elementType: elementType
+        } only %}
+    </div>
+
 	{% if elementFilters|length %}
 
 		{% if source.handle != 'global' %}
-			<p>Show an ajax lightswitch hooked up to settings to determine if this element / source combo should also display the global filters</p>
+
+	     	{{ forms.lightswitchField({
+	            label: 'Show Global Filters'|t('searchit'),
+	            instructions: 'Include global filters on this views search'|t('searchit'),
+	            id: 'hasCpSectionOverride',
+	            name: 'global['~element.handle~']['~source.handle~']',
+	            on: settings.global['~element.handle~']['~source.handle~'] ?? false,
+	        }) }}
+
 		{% endif %}
 
         <table id="elementFilters" class="data fullwidth collapsible">
