@@ -38,9 +38,8 @@
         id: 'filterType',
         name: 'filterType',
         options: {
-            custom: 'Custom'|t('searchit'),
+            manual: 'Manual'|t('searchit'),
             dynamic: 'Dynamic'|t('searchit'),
-            advanced: 'Advanced'|t('searchit'),
         },
         value: elementFilter.filterType,
         toggle: true
@@ -48,19 +47,19 @@
 
     <hr>
 
-    <div id="{{ 'custom'|id }}" {% if elementFilter.filterType != 'custom' %} class="hidden"{% endif %}>
+    <div id="{{ 'manual'|id }}" {% if elementFilter.filterType != 'manual' %} class="hidden"{% endif %}>
 
         {{ forms.editableTableField({
-            id: 'customSettings',
-            name: 'custom',
+            id: 'manualSettings',
+            name: 'manual',
             label: 'Filter Options'|t('searchit'),
             instructions: "Specify this filters dropdown options."|t('searchit'),
-            rows: elementFilter.filterType == 'custom' ? (elementFilter.custom ?? []) : [],
+            rows: elementFilter.filterType == 'manual' ? (elementFilter.options ?? []) : [],
             textual: false,
             addRowLabel: 'Add filter'|t('searchit'),
             cols: {
                 label: {
-                    heading: 'Name'|t('searchit'),
+                    heading: 'Label'|t('searchit'),
                     type: 'singleline',
                     width: '30%',
                 },
@@ -69,7 +68,7 @@
                     type: 'singleline',
                 }
             },
-            errors: elementFilter.getErrors('custom') ?? false,
+            errors: elementFilter.getErrors('manual') ?? false,
         }) }}
 
     </div>
@@ -81,7 +80,7 @@
             name: 'dynamic',
             label: 'Filter Options'|t('searchit'),
             instructions: 'Use json or twig to define this filters options.'|t('searchit'),
-            rows: 7,
+            rows: 14,
             class: 'code',
             value: elementFilter.filterType == 'dynamic' ? (elementFilter.dynamic ?? '') : '',
             errors: elementFilter.getErrors('dynamic') ?? false,
@@ -101,9 +100,24 @@
 
             <h3>Twig</h3>
             <p>
-            <pre class="code">{% for category in craft.categories.group('rooms').all() %}
-    { "filter":"roomCategory: {{ category.id }}", "label":"{{ category.title|e }}" }{{ not loop.last ? ',' }}
+            <pre class="code">{% for user in craft.users.all() %}
+    { "filter":"authorId::{{ user.id }}", "label":"{{ user.fullName|e }}" }{{ not loop.last ? ',' }}
 {% endfor %}
+
+
+{% for category in craft.categories.group('countries').all() %}
+    {{ ({
+        filter: {
+            relatedTo: {
+                element: category.id,
+                field: 'countries'
+            }
+        },
+        label: category.title
+    })|json_encode() }}{{ not loop.last ? ',' }}
+{% endfor %}
+
+
         </pre>
             </p>
 
@@ -114,13 +128,6 @@
             </p>
 
         {% endverbatim %}
-
-    </div>
-
-    <div id="{{ 'advanced'|id }}" {% if elementFilter.filterType != 'advanced' %} class="hidden"{% endif %}>
-
-        <p>We are still working on some super useful pre-defined advanced filters.</p>
-        <input type="hidden" name="advanced" value="">
 
     </div>
 

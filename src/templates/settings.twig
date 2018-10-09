@@ -43,6 +43,16 @@
 	            errors: settings.getErrors('compactMode'),
 	        }) }}
 
+	        {{ forms.textField({
+	            label: 'Max Filter Width'|t('searchit'),
+	            instructions: 'Set an optional max-width in pixels for each filter.'|t('searchit'),
+	            id: 'maxFilterWidth',
+	            name: 'maxFilterWidth',
+	            placeholder: 'auto'|t('searchit'),
+	            value: settings.maxFilterWidth,
+	            errors: settings.getErrors('maxFilterWidth'),
+	        }) }}
+
 	        <input type="submit" class="btn submit" value="{{ 'Save'|t('searchit') }}">
 
 		{% endnamespace %}

@@ -18,10 +18,9 @@ class ElementFilter extends Model
     public $type;
     public $source = '*';
     public $name;
-    public $filterType = 'custom'; // custom, dynamic, advanced
-    public $custom;
+    public $filterType = 'manual'; // custom, dynamic
+    public $manual;
     public $dynamic;
-    public $advanced;
     public $sortOrder;
 
     // Public Methods
@@ -34,43 +33,20 @@ class ElementFilter extends Model
         $rules = parent::rules();
         $rules[] = [['type', 'source', 'name', 'filterType'], 'string'];
         $rules[] = [['type', 'source', 'name', 'filterType'], 'required'];
-        $rules[] = ['custom', 'required', 'when' => [$this, 'isCustomFilterType'], 'message' => $filterOptionsRequiredMessage];
+        $rules[] = ['manual', 'required', 'when' => [$this, 'isManualFilterType'], 'message' => $filterOptionsRequiredMessage];
         $rules[] = ['dynamic', 'required', 'when' => [$this, 'isDynamicFilterType'], 'message' => $filterOptionsRequiredMessage];
-        $rules[] = ['advanced', 'required', 'when' => [$this, 'isAdvancedFilterType'], 'message' => $filterOptionsRequiredMessage];
 
         return $rules;
     }
 
-    public function isCustomFilterType()
+    public function isManualFilterType()
     {
-        return $this->filterType == 'custom';
-    }
-
-    public function isAdvancedFilterType()
-    {
-        return $this->filterType == 'advanced';
+        return $this->filterType == 'manual';
     }
 
     public function isDynamicFilterType()
     {
         return $this->filterType == 'dynamic';
-    }
-
-    public function validateOptions()
-    {
-        switch ($this->filterType)
-        {
-            case 'custom':
-                // $this->addError('dynamic', Craft::t('searchit', 'This is required'));
-                break;
-            case 'dynamic':
-                // $this->addError('dynamic', Craft::t('searchit', 'This is required'));
-                break;
-            case 'advanced':
-
-                break;
-        }
-
     }
 
     public function getOptions()
@@ -79,34 +55,33 @@ class ElementFilter extends Model
             '' => $this->name
         ];
 
+        $filters = [];
         switch ($this->filterType)
         {
-            case 'custom':
-                $filters = is_array($this->custom) ? $this->custom : [];
+            case 'manual':
+                $filters = is_string($this->manual) ? Json::decodeIfJson($this->manual, true) : [];
+                foreach ($filters as $k => $v)
+                {
+                    $filters[$k]['filter'] = Json::decodeIfJson($v['filter'], true);
+                }
                 break;
-            case 'dynamic':
 
+            case 'dynamic':
                 $view = Craft::$app->getView();
                 $currentTemplateMode = $view->getTemplateMode();
                 $view->setTemplateMode($view::TEMPLATE_MODE_SITE);
-
-                $filters = Json::decodeIfJson('[' . Craft::$app->getView()->renderString($this->dynamic) . ']', true);
-                $filters = is_array($filters) ? $filters : [];
-
+                $filters = is_string($this->dynamic) ? Json::decodeIfJson('[' . Craft::$app->getView()->renderString($this->dynamic) . ']', true) : [];
                 $view->setTemplateMode($currentTemplateMode);
                 break;
-
-            case 'advanced':
-                $filters = [];
-                break;
         }
 
-        foreach ($filters as $filter)
+        if(is_array($filters) && !empty($filters))
         {
-            $options[$filter['filter']] = $filter['label'];
-
+            foreach ($filters as $filter)
+            {
+                $options[Json::encode($filter['filter'])] = $filter['label'];
+            }
         }
-
         return $options;
     }
 

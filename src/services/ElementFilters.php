@@ -222,6 +222,7 @@ class ElementFilters extends Component
                 $supportedSources = $supportedElementType['sources'] ?? [];
                 foreach ($supportedSources as $supportedSource)
                 {
+                    $_filters = [];
                     switch ($supportedSource['key'])
                     {
                         case self::GLOBAL_SOURCE_KEY:
@@ -294,9 +295,8 @@ class ElementFilters extends Component
         $record->source = $model->source;
         $record->name = $model->name;
         $record->filterType = $model->filterType;
-        $record->custom = $model->custom;
+        $record->manual = $model->manual;
         $record->dynamic = $model->dynamic;
-        $record->advanced = $model->advanced;
         $record->sortOrder = $model->sortOrder;
 
         // Save it!
@@ -320,10 +320,6 @@ class ElementFilters extends Component
 
     public function createElementFilter(array $config = []): ElementFilter
     {
-        if(isset($config['custom']) && is_string($config['custom']))
-        {
-            $config['custom'] = Json::decodeIfJson($config['custom']);
-        }
         return new ElementFilter($config);
     }
 
@@ -347,9 +343,8 @@ class ElementFilters extends Component
                 'source',
                 'name',
                 'filterType',
-                'custom',
+                'manual',
                 'dynamic',
-                'advanced',
                 'sortOrder',
             ])
             ->from(['{{%searchit_elementfilters}}']);

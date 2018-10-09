@@ -91,9 +91,8 @@ class ElementFiltersController extends Controller
             'source' => $source,
             'name' => $request->getBodyParam('name'),
             'filterType' => $filterType,
-            'custom' => $request->getBodyParam('custom'),
+            'manual' => $request->getBodyParam('manual'),
             'dynamic' => $request->getBodyParam('dynamic'),
-            'advanced' => $request->getBodyParam('advanced'),
             'sortOrder' => $request->getBodyParam('sortOrder', 1),
         ]);
 

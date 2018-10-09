@@ -17,6 +17,7 @@ var ElementFilters = (function() {
 
 		var api = {};
 		var settings;
+		var criteria;
 
 		var elementIndexPreview;
 
@@ -37,6 +38,9 @@ var ElementFilters = (function() {
 
 		var initElementFilters = function() {
 
+			// Copy Criteria
+			criteria = copy(elementIndex.settings.criteria);
+
 			// DOM Elements
 			dom.toolbarHolder = elementIndex.$toolbar[0];
 			dom.toolbar = elementIndex.$toolbarFlexContainer[0];
@@ -44,14 +48,14 @@ var ElementFilters = (function() {
 			dom.searchHolder = dom.search.closest('.search');
 
 			// Filters
-			prepFilters()
+			prepFilters();
 
 			// Listeners
 			dom.toolbar.addEventListener('change', filterHandler, false);
 
-			elementIndex.on('updateElements', function() {
-				checkElementFilters();
-			});
+			// elementIndex.on('updateElements', function() {
+			// 	checkElementFilters();
+			// });
 
 			elementIndex.on('selectSource', function() {
 				updateElementFilters();
@@ -140,19 +144,6 @@ var ElementFilters = (function() {
 				if(filters) {
 					dom.searchHolder.parentNode.insertBefore(filters, dom.searchHolder);
 				}
-
-
-				// TODO: Can user Criteria filters, which set a criteria value rather than a search value!!!
-
-				// Craft.elementIndex.settings.criteria['authorId'] = 1;
-				// Craft.elementIndex.settings.criteria['authorId'] = null;
-				// Craft.elementIndex.settings.criteria['relatedTo'] = { element: 148, field: 'sports' };
-				// Craft.elementIndex.settings.criteria['relatedTo'] = ['and', { element: 147, field: 'sports' }, { element: 148, field: 'sports' }];
-
-				var html = '<select name="criteria[authorId]"><option value="8">Sam Hibberd</option><option value="7">Ben Callaway</option><option value="1">Sean Hill</option></select>';
-				var span = document.createElement("span");
-				span.innerHTML = html.trim();
-				dom.searchHolder.parentNode.insertBefore(span.firstChild, dom.searchHolder);
 			}
 		}
 		var updateElementFilterPreview = function() {
@@ -190,7 +181,23 @@ var ElementFilters = (function() {
 				selects.forEach(function (select, index) {
 					select.value = '';
 				});
+				resetCriteria();
 			}
+		}
+
+		var resetCriteria = function() {
+			elementIndex.settings.criteria = copy(criteria);
+		}
+
+		var updateCriteria = function(criteria) {
+
+			criteria = JSON.parse(criteria);
+
+			// TODO: Handle Duplicate relatedTo's and any others?
+
+			Object.keys(criteria).forEach(function (key, index) {
+				elementIndex.settings.criteria[key] = criteria[key];
+			});
 		}
 
 		var getActiveFilters = function(context) {
@@ -215,22 +222,27 @@ var ElementFilters = (function() {
 
 		var filterHandler = function(event) {
 
-			var filter = event.target;
-			var filters = filter.closest('['+settings.attributes.filters+']');
-			if (!filters) return;
+			var holder = event.target.closest('['+settings.attributes.filters+']');
+			if(!holder) return;
+			var selects = holder.querySelectorAll('select');
+			if(!selects) return;
 
 			event.preventDefault();
 
-			var searchValue = dom.search.value.trim();
-			for (var i = 0; i < filter.options.length; i++) {
-				if(filter.options[i].value != '') {
-					searchValue = searchValue.replace(filter.options[i].value, '');
+			resetCriteria();
+			selects.forEach(function (select, index) {
+				if(select.value != '') {
+					updateCriteria(select.value);
 				}
-		    }
+			});
+			elementIndex.updateElements();
 
-			dom.search.value = (filter.value + ' ' + searchValue).replace(/  +/g, ' ').trim();
-			tiggerChangeEvent(dom.search);
+			// TODO: Can user Criteria filters, which set a criteria value rather than a search value!!!
 
+			// Craft.elementIndex.settings.criteria['authorId'] = 1;
+			// Craft.elementIndex.settings.criteria['authorId'] = null;
+			// Craft.elementIndex.settings.criteria['relatedTo'] = { element: 148, field: 'sports' };
+			// Craft.elementIndex.settings.criteria['relatedTo'] = ['and', { element: 147, field: 'sports' }, { element: 148, field: 'sports' }];
 		};
 
 		// Public Methods

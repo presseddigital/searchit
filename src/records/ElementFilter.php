@@ -15,8 +15,8 @@ class ElementFilter extends ActiveRecord
     public function rules()
     {
         return [
-            [['elementType', 'source', 'name', 'type'], 'string'],
-            [['elementType', 'source', 'name', 'type'], 'required'],
+            [['type', 'source', 'name', 'filterType'], 'string'],
+            [['type', 'source', 'name', 'filterType'], 'required'],
         ];
     }
 

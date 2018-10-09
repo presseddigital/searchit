@@ -143,6 +143,7 @@ class Searchit extends Plugin
             $view = Craft::$app->getView();
             $view->registerAssetBundle(SearchitAssetBundle::class);
             $view->registerJs('new ElementFilters('.Json::encode($js).');');
+
             if(self::$settings->compactMode)
             {
                 $view->registerCss('
@@ -155,6 +156,11 @@ class Searchit extends Plugin
                     .toolbar .spinner { position: absolute; right: 76px; top: 0px; }
                     body.ltr .sortmenubtn[data-icon]:not(:empty):before { margin-right: 0; }
                 ');
+            }
+
+            if(self::$settings->maxFilterWidth)
+            {
+                $view->registerCss('.toolbar .serachit--filters select { max-width: '.self::$settings->maxFilterWidth.'px; }');
             }
         }
     }

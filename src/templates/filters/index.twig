@@ -50,18 +50,6 @@
             </tbody>
         </table>
 
-        {% if source.handle != 'global' %}
-
-            {{ forms.lightswitchField({
-                label: 'Show Global Filters'|t('searchit'),
-                instructions: 'Include global filters on this views search'|t('searchit'),
-                id: 'hasCpSectionOverride',
-                name: 'global['~element.handle~']['~source.handle~']',
-                on: settings.global['~element.handle~']['~source.handle~'] ?? false,
-            }) }}
-
-        {% endif %}
-
     {% endif %}
 
     <div class="buttons">
