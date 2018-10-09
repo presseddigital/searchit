@@ -15,11 +15,13 @@ class ElementFilter extends Model
     // =========================================================================
 
     public $id;
-    public $elementType;
+    public $type;
     public $source = '*';
     public $name;
-    public $type = 'custom'; // custom, dynamic, advanced
-    public $settings;
+    public $filterType = 'custom'; // custom, dynamic, advanced
+    public $custom;
+    public $dynamic;
+    public $advanced;
     public $sortOrder;
 
     // Public Methods
@@ -27,76 +29,92 @@ class ElementFilter extends Model
 
 	public function rules(): array
     {
+        $filterOptionsRequiredMessage = Craft::t('searchit', 'Filter options cannot be blank');
+
         $rules = parent::rules();
-        $rules[] = [['elementType', 'source', 'name', 'type'], 'string'];
-        $rules[] = [['elementType', 'source', 'name', 'type'], 'required'];
-        $rules[] = ['settings', 'validateSettings'];
+        $rules[] = [['type', 'source', 'name', 'filterType'], 'string'];
+        $rules[] = [['type', 'source', 'name', 'filterType'], 'required'];
+        $rules[] = ['custom', 'required', 'when' => [$this, 'isCustomFilterType'], 'message' => $filterOptionsRequiredMessage];
+        $rules[] = ['dynamic', 'required', 'when' => [$this, 'isDynamicFilterType'], 'message' => $filterOptionsRequiredMessage];
+        $rules[] = ['advanced', 'required', 'when' => [$this, 'isAdvancedFilterType'], 'message' => $filterOptionsRequiredMessage];
 
         return $rules;
     }
 
-    public function validateSettings()
+    public function isCustomFilterType()
     {
-        switch ($this->type)
+        return $this->filterType == 'custom';
+    }
+
+    public function isAdvancedFilterType()
+    {
+        return $this->filterType == 'advanced';
+    }
+
+    public function isDynamicFilterType()
+    {
+        return $this->filterType == 'dynamic';
+    }
+
+    public function validateOptions()
+    {
+        switch ($this->filterType)
         {
             case 'custom':
+                // $this->addError('dynamic', Craft::t('searchit', 'This is required'));
                 break;
             case 'dynamic':
-
-                if(empty($this->settings))
-                {
-                    $this->addError('settings', [Craft::t('This is required')]);
-                }
-
-
+                // $this->addError('dynamic', Craft::t('searchit', 'This is required'));
                 break;
             case 'advanced':
+
                 break;
         }
 
     }
 
-    public function getSettingsAsOptions()
+    public function getOptions()
     {
-        switch ($this->type)
+        $options = [
+            '' => $this->name
+        ];
+
+        switch ($this->filterType)
         {
             case 'custom':
-                return is_string($this->settings) ? Json::decodeIfJson($this->settings) : [];
+                $filters = is_array($this->custom) ? $this->custom : [];
                 break;
             case 'dynamic':
-                return Json::decode('[' . Craft::$app->getView()->renderString($this->settings) . ']', true);
+
+                $view = Craft::$app->getView();
+                $currentTemplateMode = $view->getTemplateMode();
+                $view->setTemplateMode($view::TEMPLATE_MODE_SITE);
+
+                $filters = Json::decodeIfJson('[' . Craft::$app->getView()->renderString($this->dynamic) . ']', true);
+                $filters = is_array($filters) ? $filters : [];
+
+                $view->setTemplateMode($currentTemplateMode);
                 break;
+
             case 'advanced':
-                return [];
+                $filters = [];
                 break;
         }
 
+        foreach ($filters as $filter)
+        {
+            $options[$filter['filter']] = $filter['label'];
+
+        }
+
+        return $options;
     }
 
     public function getPreview()
     {
-        $options = [
-            [
-                'label' => $this->name,
-                'value' => ''
-            ]
-        ];
-
-        $settingsAsOptions = $this->getSettingsAsOptions();
-        if ($settingsAsOptions)
-        {
-            foreach ($settingsAsOptions as $option)
-            {
-                $options[] = [
-                    'label' => $option['label'] ?? '',
-                    'value' => $option['filter'] ?? ''
-                ];
-            }
-        }
-
         return Craft::$app->getView()->renderTemplateMacro('_includes/forms', 'select', [
             [
-                'options' => $options,
+                'options' => $this->getOptions(),
             ]
         ]);
     }

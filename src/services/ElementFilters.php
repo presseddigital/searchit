@@ -9,6 +9,7 @@ use fruitstudios\searchit\helpers\ElementHelper;
 use Craft;
 use craft\base\Component;
 use craft\db\Query;
+use craft\helpers\Json;
 
 use craft\elements\Category;
 use craft\elements\Entry;
@@ -18,14 +19,20 @@ use craft\commerce\elements\Product;
 
 class ElementFilters extends Component
 {
+    // Const
+    // =========================================================================
+
+    const GLOBAL_SOURCE_HANDLE = 'global';
+    const GLOBAL_SOURCE_KEY = '*';
+
     // Properties
     // =========================================================================
 
     private $_supportedElementTypes;
-    private $_supportedSourcesByElementType = [];
+    private $_supportedSources = [];
 
     private $_fetchedAllElementFilters;
-    private $_elementFiltersById = [];
+    private $_elementFilters = [];
     private $_elementFiltersByType = [];
     private $_elementFiltersBySource = [];
 
@@ -103,16 +110,17 @@ class ElementFilters extends Component
 
     public function getSupportedSources(string $elementType)
     {
-        if(isset($this->_supportedSourcesByElementType[$elementType]))
+        if(isset($this->_supportedSources[$elementType]))
         {
-            return $this->_supportedSourcesByElementType[$elementType];
+            return $this->_supportedSources[$elementType];
         }
 
-        $sources['global'] = [
+        $sources[self::GLOBAL_SOURCE_HANDLE] = [
             'label' => Craft::t('searchit', 'Global'),
             'key' => '*',
-            'handle' => 'global',
+            'handle' => self::GLOBAL_SOURCE_HANDLE,
         ];
+
         $allSources = Craft::$app->getElementIndexes()->getSources($elementType);
         if($allSources)
         {
@@ -146,155 +154,108 @@ class ElementFilters extends Component
             }
         }
 
-        $this->_supportedSourcesByElementType[$elementType] = $sources;
-        return $this->_supportedSourcesByElementType[$elementType];
+        $this->_supportedSources[$elementType] = $sources;
+        return $this->_supportedSources[$elementType];
     }
 
-    public function getElementFilters(string $elementType = null, string $source = null)
+    public function getElementFiltersByType(string $elementType)
     {
-        if($this->_fetchedAllElementFilters)
+        if(!$this->_fetchedAllElementFilters)
         {
-            return $this->_elementFiltersBySource[$elementType][$source] ?? $this->_elementFiltersByType[$elementType] ?? $this->_elementFiltersById;
+            $this->getAllElementFilters();
         }
 
-        $results = $this->_createElementFilterQuery()
-            ->where(array_filter([
-                'elementType' => $elementType,
-                'source' => $source
-            ]))
-            ->all();
+        return $this->_elementFiltersByType[$elementType] ?? false;
+    }
 
-        if($results)
+    public function getElementFiltersBySource(string $elementType, string $sourceKey)
+    {
+        if(!$this->_fetchedAllElementFilters)
         {
-            foreach($results as $result)
-            {
-                $elementFilter = new ElementFilter($result);
-                $this->_elementFiltersById[$result['id']] = $elementFilter;
-                $this->_elementFiltersByType[$result['elementType']][$result['id']] = $elementFilter;
-                $this->_elementFiltersBySource[$result['elementType']][$result['source']][$result['id']] = $elementFilter;
-            }
+            $this->getAllElementFilters();
         }
 
-         return $this->_elementFiltersBySource[$elementType][$source] ?? $this->_elementFiltersByType[$elementType] ?? $this->_elementFiltersById;
+        return $this->_elementFiltersBySource[$elementType][$sourceKey] ?? false;
     }
 
     public function getAllElementFilters()
     {
         if($this->_fetchedAllElementFilters)
         {
-            return $this->_elementFiltersById;
+            return $this->_elementFilters;
         }
 
-        $this->getElementFilters();
+        $results = $this->_createElementFilterQuery()
+            ->all();
+
+        if($results)
+        {
+            foreach($results as $result)
+            {
+                $elementFilter = $this->createElementFilter($result);
+
+                $this->_elementFilters[$elementFilter->id] = $elementFilter;
+                $this->_elementFiltersByType[$elementFilter->type][$elementFilter->id] = $elementFilter;
+                $this->_elementFiltersBySource[$elementFilter->type][$elementFilter->source][$elementFilter->id] = $elementFilter;
+            }
+        }
+
         $this->_fetchedAllElementFilters = true;
-        return $this->_elementFiltersById;
+        return $this->_elementFilters;
     }
 
     public function getActiveElementFiltersArray(string $type = null)
     {
-        $settings = Searchit::$plugin->getSettings();
         $filters = [];
+        $this->getAllElementFilters();
 
-        $filters = [
-            [
-                'elementType' => Category::class,
-                'source' => '*',
-                'filters' => [
-                    [
-                        '' => 'Global',
-                        'fg:1' => 'Filter 1',
-                        'fg:2' => 'Filter 2',
-                        'fg:3' => 'Filter 3',
-                    ]
-                ]
-            ],
-            [
-                'elementType' => Category::class,
-                'source' => 'group:1',
-                'filters' => [
-                    [
-                        '' => 'Filter A',
-                        'fa:1' => 'Filter 1',
-                        'fa:2' => 'Filter 2',
-                        'fa:3' => 'Filter 3',
-                    ],
-                    [
-                        '' => 'Filter B',
-                        'fb:1' => 'Filter 1',
-                        'fb:2' => 'Filter 2',
-                        'fb:3' => 'Filter 3',
-                    ]
-                ]
-            ],
-            [
-                'elementType' => Category::class,
-                'source' => 'group:2',
-                'filters' => [
-                    [
-                        '' => 'Filter A',
-                        'fa:1' => 'Filter 1',
-                        'fa:2' => 'Filter 2',
-                        'fa:3' => 'Filter 3',
-                    ]
-                ]
-            ],
-            [
-                'elementType' => Entry::class,
-                'source' => '*',
-                'filters' => [
-                    [
-                        '' => 'Global',
-                        'fg:1' => 'Filter 1',
-                        'fg:2' => 'Filter 2',
-                        'fg:3' => 'Filter 3',
-                    ]
-                ]
-            ],
-            [
-                'elementType' => Entry::class,
-                'source' => 'section:7',
-                'filters' => [
-                    [
-                        '' => 'Filter A',
-                        'fa:1' => 'Filter 1',
-                        'fa:2' => 'Filter 2',
-                        'fa:3' => 'Filter 3',
-                    ],
-                    [
-                        '' => 'Filter B',
-                        'fb:1' => 'Filter 1',
-                        'fb:2' => 'Filter 2',
-                        'fb:3' => 'Filter 3',
-                    ]
-                ]
-            ],
-            [
-                'elementType' => Entry::class,
-                'source' => 'section:2',
-                'filters' => [
-                    [
-                        '' => 'Filter A',
-                        'fa:1' => 'Filter 1',
-                        'fa:2' => 'Filter 2',
-                        'fa:3' => 'Filter 3',
-                    ]
-                ]
-            ]
-        ];
+        $supportedElementTypes = $this->getSupportedElementTypes();
+        if($supportedElementTypes)
+        {
+            foreach ($supportedElementTypes as $supportedElementType)
+            {
+                // Global Filters
+                $globalElementFilters = $this->_elementFiltersBySource[$supportedElementType['class']][self::GLOBAL_SOURCE_KEY] ?? false;
+                $globalFilters = $globalElementFilters ? $this->_elementFiltersAsArrayOfFilters($globalElementFilters) : [];
 
-        // foreach ($variable as $key => $value) {
-        //     # code...
-        // }
-        // Craft::dd($settings);
+                // Sources
+                $supportedSources = $supportedElementType['sources'] ?? [];
+                foreach ($supportedSources as $supportedSource)
+                {
+                    switch ($supportedSource['key'])
+                    {
+                        case self::GLOBAL_SOURCE_KEY:
+                            if($globalFilters)
+                            {
+                                $_filters = $globalFilters;
+                            }
+                            break;
+                        default:
+                            $elementFilters = $this->_elementFiltersBySource[$supportedElementType['class']][$supportedSource['key']] ?? [];
+                            $_filters = array_merge($globalFilters, $this->_elementFiltersAsArrayOfFilters($elementFilters));
+                            break;
+                    }
+
+                    if(!empty($_filters))
+                    {
+                        $filters[] = [
+                            'elementType' => $supportedElementType['class'],
+                            'source' => $supportedSource['key'],
+                            'filters' => $_filters
+                        ];
+                    }
+                }
+            }
+        }
 
         return $filters;
     }
 
     public function getElementFilterById($id)
     {
-        if($this->_fetchedAllElementFilters || isset($this->_elementFiltersById[$id]))
+        if($this->_fetchedAllElementFilters || isset($this->_elementFilters[$id]))
         {
-            return $this->_elementFiltersById[$id] ?? null;
+            return $this->_elementFilters[$id] ?? null;
         }
 
         $result = $this->_createElementFilterQuery()
@@ -305,7 +266,7 @@ class ElementFilters extends Component
         {
             return null;
         }
-        return $this->_elementFiltersById[$id] = new ElementFilter($result);
+        return $this->_elementFilters[$id] = new ElementFilter($result);
     }
 
     public function saveElementFilter(ElementFilter $model, bool $runValidation = true): bool
@@ -329,11 +290,13 @@ class ElementFilters extends Component
             return false;
         }
 
-        $record->elementType = $model->elementType;
+        $record->type = $model->type;
         $record->source = $model->source;
         $record->name = $model->name;
-        $record->type = $model->type;
-        $record->settings = $model->settings;
+        $record->filterType = $model->filterType;
+        $record->custom = $model->custom;
+        $record->dynamic = $model->dynamic;
+        $record->advanced = $model->advanced;
         $record->sortOrder = $model->sortOrder;
 
         // Save it!
@@ -355,19 +318,38 @@ class ElementFilters extends Component
         return false;
     }
 
+    public function createElementFilter(array $config = []): ElementFilter
+    {
+        if(isset($config['custom']) && is_string($config['custom']))
+        {
+            $config['custom'] = Json::decodeIfJson($config['custom']);
+        }
+        return new ElementFilter($config);
+    }
+
     // Private Methods
     // =========================================================================
-
+    private function _elementFiltersAsArrayOfFilters(array $elementFilters = [])
+    {
+        $filters = [];
+        foreach ($elementFilters as $elementFilter)
+        {
+            $filters[] = $elementFilter->getOptions();
+        }
+        return $filters;
+    }
     private function _createElementFilterQuery(): Query
     {
         return (new Query())
             ->select([
                 'id',
-                'elementType',
+                'type',
                 'source',
                 'name',
-                'type',
-                'settings',
+                'filterType',
+                'custom',
+                'dynamic',
+                'advanced',
                 'sortOrder',
             ])
             ->from(['{{%searchit_elementfilters}}']);

@@ -5,16 +5,17 @@
 
 {% block content %}
 
-
-        {{ d(elementFilter.getErrors()) }}
-        {{ d(elementFilter) }}
+    {#
+    {{ d(elementFilter.getErrors()) }}
+    {{ d(elementFilter) }}
+    #}
 
     <input type="hidden" name="action" value="searchit/element-filters/save">
 
     {% if not isNewElementFilter %}
         <input type="hidden" name="elementFilterId" value="{{ elementFilter.id }}">
     {% endif %}
-    <input type="hidden" name="elementType" value="{{ elementType }}">
+    <input type="hidden" name="type" value="{{ elementType }}">
     <input type="hidden" name="source" value="{{ source.key }}">
 
     {{ redirectInput('searchit/filters/'~elementTypeHandle~'/'~sourceHandle) }}
@@ -34,27 +35,27 @@
     {{ forms.selectField({
         label: "Filter Type"|t('searchit'),
         instructions: "Choose the type of filter to setup."|t('searchit'),
-        id: 'type',
-        name: 'type',
+        id: 'filterType',
+        name: 'filterType',
         options: {
             custom: 'Custom'|t('searchit'),
             dynamic: 'Dynamic'|t('searchit'),
             advanced: 'Advanced'|t('searchit'),
         },
-        value: elementFilter.type,
+        value: elementFilter.filterType,
         toggle: true
     }) }}
 
     <hr>
 
-    <div id="{{ 'custom'|id }}" {% if elementFilter.type != 'custom' %} class="hidden"{% endif %}>
+    <div id="{{ 'custom'|id }}" {% if elementFilter.filterType != 'custom' %} class="hidden"{% endif %}>
 
         {{ forms.editableTableField({
             id: 'customSettings',
-            name: 'settings[custom]',
+            name: 'custom',
             label: 'Filter Options'|t('searchit'),
             instructions: "Specify this filters dropdown options."|t('searchit'),
-            rows: elementFilter.type == 'custom' ? (elementFilter.settingsAsOptions ?? []) : [],
+            rows: elementFilter.filterType == 'custom' ? (elementFilter.custom ?? []) : [],
             textual: false,
             addRowLabel: 'Add filter'|t('searchit'),
             cols: {
@@ -68,21 +69,22 @@
                     type: 'singleline',
                 }
             },
-            errors: []
+            errors: elementFilter.getErrors('custom') ?? false,
         }) }}
 
     </div>
 
-    <div id="{{ 'dynamic'|id }}" {% if elementFilter.type != 'dynamic' %} class="hidden"{% endif %}>
+    <div id="{{ 'dynamic'|id }}" {% if elementFilter.filterType != 'dynamic' %} class="hidden"{% endif %}>
 
         {{ forms.textareaField({
             id: 'dynamicSettings',
-            name: 'settings[dynamic]',
+            name: 'dynamic',
             label: 'Filter Options'|t('searchit'),
             instructions: 'Use json or twig to define this filters options.'|t('searchit'),
             rows: 7,
             class: 'code',
-            value: elementFilter.type == 'dynamic' ? (elementFilter.settings ?? '') : '',
+            value: elementFilter.filterType == 'dynamic' ? (elementFilter.dynamic ?? '') : '',
+            errors: elementFilter.getErrors('dynamic') ?? false,
         }) }}
 
         {% verbatim %}
@@ -100,7 +102,7 @@
             <h3>Twig</h3>
             <p>
             <pre class="code">{% for category in craft.categories.group('rooms').all() %}
-    { "filter":"roomCategory: {{ category.id }}", "label":"{{ category.name|e }}" }{{ not loop.last ? ',' }}
+    { "filter":"roomCategory: {{ category.id }}", "label":"{{ category.title|e }}" }{{ not loop.last ? ',' }}
 {% endfor %}
         </pre>
             </p>
@@ -115,10 +117,10 @@
 
     </div>
 
-    <div id="{{ 'advanced'|id }}" {% if elementFilter.type != 'advanced' %} class="hidden"{% endif %}>
+    <div id="{{ 'advanced'|id }}" {% if elementFilter.filterType != 'advanced' %} class="hidden"{% endif %}>
 
         <p>We are still working on some super useful pre-defined advanced filters.</p>
-        <input type="hidden" name="settings[advanced]" value="">
+        <input type="hidden" name="advanced" value="">
 
     </div>
 

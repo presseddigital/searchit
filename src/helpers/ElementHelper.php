@@ -1,6 +1,8 @@
 <?php
 namespace fruitstudios\searchit\helpers;
 
+use fruitstudios\searchit\Searchit;
+
 use Craft;
 use craft\elements\Entry;
 use craft\elements\Category;
@@ -53,6 +55,11 @@ class ElementHelper
 
     public static function sourceKeyAsHandle(string $key)
     {
+        if ($key == Searchit::$plugin->getElementFilters()::GLOBAL_SOURCE_KEY)
+        {
+            return Searchit::$plugin->getElementFilters()::GLOBAL_SOURCE_HANDLE;
+        }
+
         return StringHelper::replace($key, ':', '-');
     }
 

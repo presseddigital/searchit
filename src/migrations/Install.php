@@ -51,11 +51,13 @@ class Install extends Migration
                 '{{%searchit_elementfilters}}',
                 [
                     'id' => $this->primaryKey(),
-                    'elementType' => $this->string()->notNull(),
+                    'type' => $this->string()->notNull(),
                     'source' => $this->string()->notNull(),
                     'name' => $this->string()->notNull(),
-                    'type' => $this->enum('type', ['custom', 'dynamic', 'advanced'])->notNull()->defaultValue('custom'),
-                    'settings' => $this->text(),
+                    'filterType' => $this->enum('filterType', ['custom', 'dynamic', 'advanced'])->notNull()->defaultValue('custom'),
+                    'custom' => $this->text(),
+                    'dynamic' => $this->text(),
+                    'advanced' => $this->text(),
                     'sortOrder' => $this->smallInteger()->unsigned(),
                     'dateCreated' => $this->dateTime()->notNull(),
                     'dateUpdated' => $this->dateTime()->notNull(),
@@ -71,7 +73,7 @@ class Install extends Migration
         $this->createIndex(
             $this->db->getIndexName('{{%searchit_elementfilters}}', 'name', true),
             '{{%searchit_elementfilters}}',
-            ['elementType', 'source'],
+            ['type', 'source', 'filterType'],
             false
         );
     }

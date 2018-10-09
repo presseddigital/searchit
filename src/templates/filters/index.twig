@@ -9,8 +9,8 @@
         <p>{{ 'Add filters which will optionally display in all element search toolbars.'|t('searchit') }}</p>
     {% else %}
         <p>{{ 'Add filters which will only display in the element search toolbar on the {element} {source} view.'|t('searchit', {
-            element: element.displayName,
-            source: source.label,
+            element: element.displayName|lower,
+            source: source.label|lower,
         }) }}</p>
     {% endif %}
 
@@ -20,7 +20,7 @@
 	</div>
 	#}
 
-	<div class="elementindex" data-element-filter-preview-element-type="{{ elementType }}" data-element-filter-preview-source="{{ source.key }}">
+	<div class="elementindex" data-element-filter-preview data-type="{{ elementType }}" data-source="{{ source.key }}">
         {% include "_elements/indexcontainer" with {
             showSiteMenu: false,
             elementType: elementType
@@ -28,18 +28,6 @@
     </div>
 
 	{% if elementFilters|length %}
-
-		{% if source.handle != 'global' %}
-
-	     	{{ forms.lightswitchField({
-	            label: 'Show Global Filters'|t('searchit'),
-	            instructions: 'Include global filters on this views search'|t('searchit'),
-	            id: 'hasCpSectionOverride',
-	            name: 'global['~element.handle~']['~source.handle~']',
-	            on: settings.global['~element.handle~']['~source.handle~'] ?? false,
-	        }) }}
-
-		{% endif %}
 
         <table id="elementFilters" class="data fullwidth collapsible">
             <thead>
@@ -54,13 +42,25 @@
                 {% for elementFilter in elementFilters %}
                     <tr data-id="{{ elementFilter.id }}" data-name="{{ elementFilter.name }}">
                         <th scope="row" data-title="{{ 'Name'|t('searchit') }}"><a href="{{ url('searchit/filters/'~element.handle~'/'~source.handle~'/'~elementFilter.id) }}">{{ elementFilter.name }}</a></th>
-                        <td data-title="{{ 'Type'|t('searchit') }}">{{ elementFilter.type|ucfirst }}</td>
+                        <td data-title="{{ 'Type'|t('searchit') }}">{{ elementFilter.filterType|ucfirst }}</td>
                         <td data-title="{{ 'Preview'|t('searchit') }}">{{ elementFilter.getPreview()|raw }}</td>
                         <td class="thin"><a class="delete icon" title="{{ 'Delete'|t('searchit') }}" role="button"></a></td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
+
+        {% if source.handle != 'global' %}
+
+            {{ forms.lightswitchField({
+                label: 'Show Global Filters'|t('searchit'),
+                instructions: 'Include global filters on this views search'|t('searchit'),
+                id: 'hasCpSectionOverride',
+                name: 'global['~element.handle~']['~source.handle~']',
+                on: settings.global['~element.handle~']['~source.handle~'] ?? false,
+            }) }}
+
+        {% endif %}
 
     {% endif %}
 

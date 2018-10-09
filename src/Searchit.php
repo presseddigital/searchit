@@ -54,7 +54,7 @@ class Searchit extends Plugin
     // Public Properties
     // =========================================================================
 
-    public $schemaVersion = '1.0.2';
+    public $schemaVersion = '1.0.0';
 
     // Traits
     // =========================================================================
@@ -91,9 +91,9 @@ class Searchit extends Plugin
         $this->_registerVariables();
         $this->_registerElementTypes();
 
-        Craft::info(Craft::t('searchit', '{name} plugin loaded', ['name' => $this->name]), __METHOD__);
-
         $this->initElementFilters();
+
+        Craft::info(Craft::t('searchit', '{name} plugin loaded', ['name' => $this->name]), __METHOD__);
     }
 
     public function beforeInstall(): bool

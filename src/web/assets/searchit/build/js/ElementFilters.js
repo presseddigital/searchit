@@ -17,11 +17,15 @@ var ElementFilters = (function() {
 
 		var api = {};
 		var settings;
+
+		var elementIndexPreview;
+
 		var elementIndex;
 		var elementIndexType;
 		var elementFilters = {};
 
 		var dom = {
+			preview: null,
 			toolbarHolder: null,
 			toolbar: null,
 			searchHolder: null,
@@ -40,6 +44,44 @@ var ElementFilters = (function() {
 			dom.searchHolder = dom.search.closest('.search');
 
 			// Filters
+			prepFilters()
+
+			// Listeners
+			dom.toolbar.addEventListener('change', filterHandler, false);
+
+			elementIndex.on('updateElements', function() {
+				checkElementFilters();
+			});
+
+			elementIndex.on('selectSource', function() {
+				updateElementFilters();
+			});
+
+			// Status
+			dom.toolbarHolder.setAttribute(settings.attributes.id, settings.id);
+
+			// Update
+			updateElementFilters();
+		};
+
+		var initElementFilterPreview = function() {
+
+			if (!elementIndexPreview) {
+				return;
+			}
+
+			// DOM Elements
+			dom.preview = elementIndexPreview;
+			dom.searchHolder = dom.preview.querySelector('.search');
+
+			// Filters
+			prepFilters()
+
+			// Update
+			updateElementFilterPreview();
+		};
+
+		var prepFilters = function() {
 			var filters = Array.from(settings.filters);
 			filters.forEach(function (filter, filterIndex) {
 
@@ -72,21 +114,7 @@ var ElementFilters = (function() {
 				}
 				elementFilters[filter.elementType][filter.source] = container;
 			});
-
-			// Listeners
-			dom.toolbar.addEventListener('change', filterHandler, false);
-
-			elementIndex.on('updateElements', function() {
-				checkElementFilters();
-			});
-
-			elementIndex.on('selectSource', function() {
-				updateElementFilters();
-			});
-
-			// Status
-			dom.toolbarHolder.setAttribute(settings.attributes.id, settings.id);
-		};
+		}
 
 		var getElementFilters = function(elementType, source) {
 
@@ -108,7 +136,30 @@ var ElementFilters = (function() {
 					activeFilters.remove();
 				}
 
-				var filters = getElementFilters(elementIndex.elementType, elementIndex.sourceKey);
+				var filters  = getElementFilters(elementIndex.elementType, elementIndex.sourceKey);
+				if(filters) {
+					dom.searchHolder.parentNode.insertBefore(filters, dom.searchHolder);
+				}
+
+
+				// TODO: Can user Criteria filters, which set a criteria value rather than a search value!!!
+
+				// Craft.elementIndex.settings.criteria['authorId'] = 1;
+				// Craft.elementIndex.settings.criteria['authorId'] = null;
+				// Craft.elementIndex.settings.criteria['relatedTo'] = { element: 148, field: 'sports' };
+				// Craft.elementIndex.settings.criteria['relatedTo'] = ['and', { element: 147, field: 'sports' }, { element: 148, field: 'sports' }];
+
+				var html = '<select name="criteria[authorId]"><option value="8">Sam Hibberd</option><option value="7">Ben Callaway</option><option value="1">Sean Hill</option></select>';
+				var span = document.createElement("span");
+				span.innerHTML = html.trim();
+				dom.searchHolder.parentNode.insertBefore(span.firstChild, dom.searchHolder);
+			}
+		}
+		var updateElementFilterPreview = function() {
+
+			if(dom.preview) {
+
+				var filters = getElementFilters(dom.preview.getAttribute('data-type'), dom.preview.getAttribute('data-source'));
 				if(filters) {
 					dom.searchHolder.parentNode.insertBefore(filters, dom.searchHolder);
 				}
@@ -197,6 +248,13 @@ var ElementFilters = (function() {
 				return;
 			}
 
+			// Is Preview
+			elementIndexPreview = document.querySelector('[data-element-filter-preview]');
+			if (elementIndexPreview) {
+				initElementFilterPreview();
+				return;
+			}
+
 			// Get Element Index
 			if(typeof Craft.elementIndex !== 'undefined') {
 				elementIndex = Craft.elementIndex;
@@ -208,6 +266,8 @@ var ElementFilters = (function() {
 					elementIndexType = 'modal';
 				}
 			}
+
+			if (true) {}
 
 			if(!elementIndex) {
 				return;
@@ -222,7 +282,6 @@ var ElementFilters = (function() {
 			};
 
 			initElementFilters();
-			updateElementFilters();
 		};
 
 		api.init(options);

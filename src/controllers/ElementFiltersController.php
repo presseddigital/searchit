@@ -21,7 +21,7 @@ class ElementFiltersController extends Controller
         $elementType = ElementHelper::getElementTypeByHandle($elementTypeHandle);
         $element = Searchit::$plugin->getElementFilters()->getElementInfo($elementType);
         $source = Searchit::$plugin->getElementFilters()->getSourceInfo($elementType, $sourceHandle);
-        $elementFilters = Searchit::$plugin->getElementFilters()->getElementFilters($elementType, $source['key']);
+        $elementFilters = Searchit::$plugin->getElementFilters()->getElementFiltersBySource($elementType, $source['key']);
 
         return $this->renderTemplate('searchit/filters/index', compact(
             'elementTypeHandle',
@@ -56,7 +56,7 @@ class ElementFiltersController extends Controller
             else
             {
                 $elementFilter = new ElementFilter();
-                $elementFilter->elementType = $elementType;
+                $elementFilter->type = $elementType;
                 $elementFilter->source = $source['key'];
             }
         }
@@ -81,18 +81,20 @@ class ElementFiltersController extends Controller
         $elementFiltersService = Searchit::$plugin->getElementFilters();
         $request = Craft::$app->getRequest();
 
-        $elementType = $request->getRequiredBodyParam('elementType');
-        $source = $request->getRequiredBodyParam('source');
         $type = $request->getRequiredBodyParam('type');
+        $source = $request->getRequiredBodyParam('source');
+        $filterType = $request->getRequiredBodyParam('filterType');
 
-        $elementFilter = new ElementFilter([
+        $elementFilter = $elementFiltersService->createElementFilter([
             'id' => $request->getBodyParam('elementFilterId'),
-            'elementType' => $elementType,
+            'type' => $type,
             'source' => $source,
             'name' => $request->getBodyParam('name'),
-            'type' => $type,
-            'settings' => $request->getBodyParam('settings.'.$type),
-            'sortOrder' => $request->getBodyParam('sortOrder'),
+            'filterType' => $filterType,
+            'custom' => $request->getBodyParam('custom'),
+            'dynamic' => $request->getBodyParam('dynamic'),
+            'advanced' => $request->getBodyParam('advanced'),
+            'sortOrder' => $request->getBodyParam('sortOrder', 1),
         ]);
 
         if (!$elementFiltersService->saveElementFilter($elementFilter)) {
