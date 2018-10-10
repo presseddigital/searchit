@@ -21,6 +21,7 @@ class SearchitAssetBundle extends AssetBundle
             'js/vendor/polyfill.js',
             'js/vendor/extend.js',
             'js/vendor/copy.js',
+            'js/vendor/trueTypeOf.js',
             'js/ElementFilters.js',
         ];
 

@@ -54,7 +54,7 @@
             name: 'manual',
             label: 'Filter Options'|t('searchit'),
             instructions: "Specify this filters dropdown options."|t('searchit'),
-            rows: elementFilter.filterType == 'manual' ? (elementFilter.options ?? []) : [],
+            rows: elementFilter.filterType == 'manual' ? (elementFilter.manual ?? []) : [],
             textual: false,
             addRowLabel: 'Add filter'|t('searchit'),
             cols: {
@@ -64,7 +64,7 @@
                     width: '30%',
                 },
                 filter: {
-                    heading: 'Filter'|t('searchit'),
+                    heading: 'Criteria (JSON)'|t('searchit'),
                     type: 'singleline',
                 }
             },
@@ -82,28 +82,21 @@
             instructions: 'Use json or twig to define this filters options.'|t('searchit'),
             rows: 14,
             class: 'code',
-            value: elementFilter.filterType == 'dynamic' ? (elementFilter.dynamic ?? '') : '',
+            value: elementFilter.filterType == 'dynamic' ? (elementFilter.settings ?? '') : '',
             errors: elementFilter.getErrors('dynamic') ?? false,
         }) }}
 
         {% verbatim %}
-
-            <h3>JSON</h3>
-            <p>
-            <pre class="code">{ "filter":"roomCategory: 1", "label":"Room 1" },
-{ "filter":"roomCategory: 2", "label":"Room 2" },
-{ "filter":"roomCategory: 3", "label":"Room 3" },
-{ "filter":"roomCategory: 4", "label":"Room 4" }
-        </pre>
-            </p>
-
-
             <h3>Twig</h3>
             <p>
             <pre class="code">{% for user in craft.users.all() %}
-    { "filter":"authorId::{{ user.id }}", "label":"{{ user.fullName|e }}" }{{ not loop.last ? ',' }}
+    {{ ({
+        filter: {
+            authorId: user.id
+        },
+        label: user.fullName
+    })|json_encode() }}{{ not loop.last ? ',' }}
 {% endfor %}
-
 
 {% for category in craft.categories.group('countries').all() %}
     {{ ({
@@ -116,14 +109,21 @@
         label: category.title
     })|json_encode() }}{{ not loop.last ? ',' }}
 {% endfor %}
-
-
         </pre>
             </p>
 
             <h3>Twig Include</h3>
             <p>
             <pre class="code">{% include '_includes/filters/rooms' ignore missing %}
+        </pre>
+            </p>
+
+            <h3>JSON</h3>
+            <p>
+            <pre class="code">{ "filter":"page 1", "label":"Page 1" },
+{ "filter":"page 2", "label":"Page 2" },
+{ "filter":"page 3", "label":"Page 3" },
+{ "filter":"page 4", "label":"Page 4" }
         </pre>
             </p>
 

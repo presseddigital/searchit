@@ -1,6 +1,8 @@
 {% extends "searchit/_layouts/main" %}
 {% import "_includes/forms" as forms %}
 
+{% set sortable = true %}
+
 {% block content %}
 
 	<h2>{{ source.label }} {{ element.displayName }} {{ 'Filters'|t('searchit') }}</h2>
@@ -32,6 +34,9 @@
         <table id="elementFilters" class="data fullwidth collapsible">
             <thead>
                 <tr>
+                    {% if sortable %}
+                        <td class="thin"></td>
+                    {% endif %}
                     <th scope="col">{{ "Name"|t('searchit') }}</th>
                     <th scope="col">{{ "Type"|t('searchit') }}</th>
                     <th scope="col">{{ "Preview"|t('searchit') }}</th>
@@ -41,7 +46,16 @@
             <tbody>
                 {% for elementFilter in elementFilters %}
                     <tr data-id="{{ elementFilter.id }}" data-name="{{ elementFilter.name }}">
-                        <th scope="row" data-title="{{ 'Name'|t('searchit') }}"><a href="{{ url('searchit/filters/'~element.handle~'/'~source.handle~'/'~elementFilter.id) }}">{{ elementFilter.name }}</a></th>
+
+                        {% if sortable %}
+                            <td class="thin">
+                                <a class="move icon" title="{{ 'Move'|t('app') }}"></a>
+                            </td>
+                        {% endif %}
+
+                        <th scope="row" data-title="{{ 'Name'|t('searchit') }}">
+                            <a href="{{ url('searchit/filters/'~element.handle~'/'~source.handle~'/'~elementFilter.id) }}">{{ elementFilter.name }}</a>
+                        </th>
                         <td data-title="{{ 'Type'|t('searchit') }}">{{ elementFilter.filterType|ucfirst }}</td>
                         <td data-title="{{ 'Preview'|t('searchit') }}">{{ elementFilter.getPreview()|raw }}</td>
                         <td class="thin"><a class="delete icon" title="{{ 'Delete'|t('searchit') }}" role="button"></a></td>
@@ -64,6 +78,8 @@
         noObjectsSelector: '#no-elementFilters',
         newObjectBtnSelector: '#newElementFilterButtonContainer',
         deleteAction: 'searchit/element-filters/delete',
-        confirmDeleteMessage: '{{ "Are you sure you want to delete the filter “{name}”?"|t('searchit') }}'
+        confirmDeleteMessage: '{{ "Are you sure you want to delete the filter “{name}”?"|t('searchit') }}',
+        sortable: {{ sortable ? 'true' : 'false' }},
+        reorderAction: 'searchit/element-filters/reorder',
     });
 {% endjs %}

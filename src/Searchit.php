@@ -160,7 +160,7 @@ class Searchit extends Plugin
 
             if(self::$settings->maxFilterWidth)
             {
-                $view->registerCss('.toolbar .serachit--filters select { max-width: '.self::$settings->maxFilterWidth.'px; }');
+                $view->registerCss('.toolbar .searchit--filters select { max-width: '.self::$settings->maxFilterWidth.'px; }');
             }
         }
     }

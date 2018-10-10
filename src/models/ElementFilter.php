@@ -59,7 +59,7 @@ class ElementFilter extends Model
         switch ($this->filterType)
         {
             case 'manual':
-                $filters = is_string($this->manual) ? Json::decodeIfJson($this->manual, true) : [];
+                $filters = $this->manual;
                 foreach ($filters as $k => $v)
                 {
                     $filters[$k]['filter'] = Json::decodeIfJson($v['filter'], true);

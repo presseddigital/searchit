@@ -267,7 +267,7 @@ class ElementFilters extends Component
         {
             return null;
         }
-        return $this->_elementFilters[$id] = new ElementFilter($result);
+        return $this->_elementFilters[$id] = $this->createElementFilter($result);
     }
 
     public function saveElementFilter(ElementFilter $model, bool $runValidation = true): bool
@@ -320,6 +320,7 @@ class ElementFilters extends Component
 
     public function createElementFilter(array $config = []): ElementFilter
     {
+        $config['manual'] = is_string($config['manual']) ? Json::decodeIfJson($config['manual'], true) : ($config['manual'] ?? null);
         return new ElementFilter($config);
     }
 

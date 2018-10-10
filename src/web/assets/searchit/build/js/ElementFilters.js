@@ -17,7 +17,7 @@ var ElementFilters = (function() {
 
 		var api = {};
 		var settings;
-		var criteria;
+		var baseCriteria;
 
 		var elementIndexPreview;
 
@@ -27,9 +27,7 @@ var ElementFilters = (function() {
 
 		var dom = {
 			preview: null,
-			toolbarHolder: null,
 			toolbar: null,
-			searchHolder: null,
 			search: null,
 		};
 
@@ -39,13 +37,11 @@ var ElementFilters = (function() {
 		var initElementFilters = function() {
 
 			// Copy Criteria
-			criteria = copy(elementIndex.settings.criteria);
+			baseCriteria = copy(elementIndex.settings.criteria);
 
 			// DOM Elements
-			dom.toolbarHolder = elementIndex.$toolbar[0];
-			dom.toolbar = elementIndex.$toolbarFlexContainer[0];
-			dom.search = elementIndex.$search[0];
-			dom.searchHolder = dom.search.closest('.search');
+			dom.toolbar = elementIndex.$toolbar[0];
+			dom.search = elementIndex.$search[0].closest('.search');
 
 			// Filters
 			prepFilters();
@@ -53,16 +49,12 @@ var ElementFilters = (function() {
 			// Listeners
 			dom.toolbar.addEventListener('change', filterHandler, false);
 
-			// elementIndex.on('updateElements', function() {
-			// 	checkElementFilters();
-			// });
-
 			elementIndex.on('selectSource', function() {
 				updateElementFilters();
 			});
 
 			// Status
-			dom.toolbarHolder.setAttribute(settings.attributes.id, settings.id);
+			dom.toolbar.setAttribute(settings.attributes.id, settings.id);
 
 			// Update
 			updateElementFilters();
@@ -76,7 +68,7 @@ var ElementFilters = (function() {
 
 			// DOM Elements
 			dom.preview = elementIndexPreview;
-			dom.searchHolder = dom.preview.querySelector('.search');
+			dom.search = dom.preview.querySelector('.search');
 
 			// Filters
 			prepFilters()
@@ -142,7 +134,7 @@ var ElementFilters = (function() {
 
 				var filters  = getElementFilters(elementIndex.elementType, elementIndex.sourceKey);
 				if(filters) {
-					dom.searchHolder.parentNode.insertBefore(filters, dom.searchHolder);
+					dom.search.parentNode.insertBefore(filters, dom.search);
 				}
 			}
 		}
@@ -152,27 +144,13 @@ var ElementFilters = (function() {
 
 				var filters = getElementFilters(dom.preview.getAttribute('data-type'), dom.preview.getAttribute('data-source'));
 				if(filters) {
-					dom.searchHolder.parentNode.insertBefore(filters, dom.searchHolder);
+					dom.search.parentNode.insertBefore(filters, dom.search);
 				}
 			}
 		}
 
-		var checkElementFilters = function() {
-
-			if(dom.toolbar && elementIndex) {
-				var searchValue = dom.search.value;
-				var activeFilters = getActiveFilters();
-				if(activeFilters) {
-					var selects = activeFilters.querySelectorAll('select');
-					if(selects) {
-						selects.forEach(function (select, index) {
-							if(!searchValue.includes(select.value)) {
-								select.value = '';
-							}
-						});
-					}
-				}
-			}
+		var getActiveFilters = function(context) {
+			return dom.toolbar.querySelector('.searchit--filters');
 		}
 
 		var resetFilters = function(context) {
@@ -182,38 +160,64 @@ var ElementFilters = (function() {
 					select.value = '';
 				});
 				resetCriteria();
+				console.log('[ElementFilters][resetFilters]', elementIndex.settings.criteria);
 			}
 		}
 
 		var resetCriteria = function() {
-			elementIndex.settings.criteria = copy(criteria);
+			elementIndex.settings.criteria = copy(baseCriteria);
 		}
 
-		var updateCriteria = function(criteria) {
+		var updateCriteria = function(values) {
 
-			criteria = JSON.parse(criteria);
+			if(trueTypeOf(values) !== 'array') return;
 
-			// TODO: Handle Duplicate relatedTo's and any others?
+			values.forEach(function (value, index) {
+				updateCriteriaValue(value);
+			});
 
-			Object.keys(criteria).forEach(function (key, index) {
-				elementIndex.settings.criteria[key] = criteria[key];
+			if(settings.debug) {
+				console.log('[ElementFilters][updateCriteria]', elementIndex.settings.criteria);
+			}
+		}
+
+		var updateCriteriaValue = function(criteriaValue) {
+
+			criteriaValue = JSON.parse(criteriaValue);
+
+			if(trueTypeOf(criteriaValue) === 'string') {
+				criteriaValue = {
+					search: criteriaValue
+				}
+			}
+
+			Object.keys(criteriaValue).forEach(function (key, index) {
+
+				var _newCriteria;
+				var _existingCriteriaValue = elementIndex.settings.criteria.hasOwnProperty(key) ? copy(elementIndex.settings.criteria[key]) : false;
+
+				switch(key) {
+					case('relatedTo'):
+						_newCriteria = prepCriteriaValue(criteriaValue[key], _existingCriteriaValue);
+						break;
+					default:
+						_newCriteria = criteriaValue[key];
+						break;
+				}
+
+				elementIndex.settings.criteria[key] = _newCriteria;
+
 			});
 		}
 
-		var getActiveFilters = function(context) {
-			return dom.toolbar.querySelector('.searchit--filters');
-		}
+		var prepCriteriaValue = function(newValue, existingValue) {
 
-		var tiggerChangeEvent = function (element)
-		{
-			if ("createEvent" in document) {
-			    var evt = document.createEvent("HTMLEvents");
-			    evt.initEvent("change", false, true);
-			    element.dispatchEvent(evt);
-			}
-			else
-			{
-			    element.fireEvent("onchange");
+			if(!existingValue) return newValue;
+
+			if(trueTypeOf(existingValue) === 'array' && existingValue[0] !== 'and') {
+				return existingValue.push(newValue);
+			} else {
+				return ['and', existingValue, newValue];
 			}
 		}
 
@@ -230,19 +234,18 @@ var ElementFilters = (function() {
 			event.preventDefault();
 
 			resetCriteria();
+
+			var values = [];
 			selects.forEach(function (select, index) {
 				if(select.value != '') {
-					updateCriteria(select.value);
+					values.push(select.value)
 				}
 			});
+			if(values.length > 0) {
+				updateCriteria(values);
+			}
 			elementIndex.updateElements();
 
-			// TODO: Can user Criteria filters, which set a criteria value rather than a search value!!!
-
-			// Craft.elementIndex.settings.criteria['authorId'] = 1;
-			// Craft.elementIndex.settings.criteria['authorId'] = null;
-			// Craft.elementIndex.settings.criteria['relatedTo'] = { element: 148, field: 'sports' };
-			// Craft.elementIndex.settings.criteria['relatedTo'] = ['and', { element: 147, field: 'sports' }, { element: 148, field: 'sports' }];
 		};
 
 		// Public Methods
@@ -260,7 +263,7 @@ var ElementFilters = (function() {
 				return;
 			}
 
-			// Is Preview
+			// Preview
 			elementIndexPreview = document.querySelector('[data-element-filter-preview]');
 			if (elementIndexPreview) {
 				initElementFilterPreview();
@@ -279,19 +282,13 @@ var ElementFilters = (function() {
 				}
 			}
 
-			if (true) {}
-
-			if(!elementIndex) {
-				return;
-			}
+			if(!elementIndex) return;
 
 			if (settings.debug) {
 				console.log('[ElementFilters][elementIndex]', elementIndexType, elementIndex);
 			}
 
-			if(elementIndex.$toolbar[0].hasAttribute(settings.attributes.id)){
-				return;
-			};
+			if(elementIndex.$toolbar[0].hasAttribute(settings.attributes.id)) return;
 
 			initElementFilters();
 		};
