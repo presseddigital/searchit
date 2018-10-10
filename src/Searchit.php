@@ -91,7 +91,10 @@ class Searchit extends Plugin
         $this->_registerVariables();
         $this->_registerElementTypes();
 
-        $this->initElementFilters();
+        if($this->isInstalled)
+        {
+            $this->initElementFilters();
+        }
 
         Craft::info(Craft::t('searchit', '{name} plugin loaded', ['name' => $this->name]), __METHOD__);
     }

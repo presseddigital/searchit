@@ -8,6 +8,7 @@ use fruitstudios\searchit\models\ElementFilter;
 use Craft;
 use craft\web\Controller;
 use craft\helpers\StringHelper;
+use craft\helpers\Json;
 
 use yii\web\Response;
 
@@ -124,6 +125,18 @@ class ElementFiltersController extends Controller
             return $this->asJson(['success' => true]);
         }
         return $this->asErrorJson(Craft::t('searchit', 'Could not delete element filter'));
+    }
+
+    public function actionReorder(): Response
+    {
+        $this->requirePostRequest();
+        $this->requireAcceptsJson();
+
+        $elementFilterIds = Json::decode(Craft::$app->getRequest()->getRequiredBodyParam('ids'));
+        Searchit::$plugin->getElementFilters()->reorderElementFilters($elementFilterIds);
+
+        return $this->asJson(['success' => true]);
+
     }
 
 }

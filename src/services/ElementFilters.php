@@ -297,7 +297,16 @@ class ElementFilters extends Component
         $record->filterType = $model->filterType;
         $record->manual = $model->manual;
         $record->dynamic = $model->dynamic;
-        $record->sortOrder = $model->sortOrder;
+
+        $maxSortOrder = (new Query())
+            ->from(['{{%searchit_elementfilters}}'])
+            ->where([
+                'type' => $model->type,
+                'source' => $model->source,
+            ])
+            ->max('[[sortOrder]]');
+
+        $record->sortOrder = $maxSortOrder ? $maxSortOrder + 1 : 1;
 
         // Save it!
         $record->save(false);
@@ -316,6 +325,27 @@ class ElementFilters extends Component
             return (bool)$record->delete();
         }
         return false;
+    }
+
+    public function reorderElementFilters(array $elementFilterIds): bool
+    {
+        $transaction = Craft::$app->getDb()->beginTransaction();
+
+        try {
+            foreach ($elementFilterIds as $sortOrder => $elementFilterId)
+            {
+                $elementFilterRecord = ElementFilterRecord::findOne($elementFilterId);
+                $elementFilterRecord->sortOrder = $sortOrder + 1;
+                $elementFilterRecord->save();
+            }
+
+            $transaction->commit();
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+            throw $e;
+        }
+
+        return true;
     }
 
     public function createElementFilter(array $config = []): ElementFilter
@@ -348,6 +378,7 @@ class ElementFilters extends Component
                 'dynamic',
                 'sortOrder',
             ])
-            ->from(['{{%searchit_elementfilters}}']);
+            ->from(['{{%searchit_elementfilters}}'])
+            ->orderBy('sortOrder');
     }
 }
