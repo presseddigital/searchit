@@ -1,6 +1,6 @@
 {
     "name": "fruitstudios/searchit",
-    "description": "Configurable search filters for turbocharged search in the Craft CP.",
+    "description": "Configurable filters for enhanced element search in the Craft CP.",
     "type": "craft-plugin",
     "version": "1.0.0",
     "keywords": [
@@ -12,7 +12,8 @@
         "cp-search",
         "filters",
         "search-filters",
-        "search"
+        "search",
+        "elements"
     ],
     "support": {
         "docs": "https://github.com/fruitstudios/craft-searchit/blob/master/README.md",
