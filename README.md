@@ -13,12 +13,11 @@ Uses and extends the Craft CP element [search](https://docs.craftcms.com/v3/sear
 
 ## Creating a filter
 
-Filters are created by valid JSON rows. They need a `label` which is a string and a `filter` which can either by a string or valid JSON
+Filters can be produced manually or dynamically and are made up of a JSON array containing rows with a label key `(string)` and a filter key `(string or valid JSON)`. If the filter contains a `string` then it will pass that value to the `search` parameter on the element search. If you pass JSON to the filter than you can create multiple parameters.
 
 ## Examples
 
 You have two ways to setup filters. Manually or dynamically.
-
 
 #### Using Twig (Recommended)
 ```php
