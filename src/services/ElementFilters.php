@@ -16,7 +16,10 @@ use craft\elements\Category;
 use craft\elements\Entry;
 use craft\elements\User;
 use craft\elements\Asset;
+
 use craft\commerce\elements\Product;
+
+use craft\commerce\Plugin as CommercePlugin;
 
 class ElementFilters extends Component
 {
@@ -94,16 +97,21 @@ class ElementFilters extends Component
             'sources' => $this->getSupportedSources(Asset::class),
         ];
 
-        if(Searchit::$commerceInstalled)
-        {
-            $types[Product::class] = [
-                'class' => Product::class,
-                'handle' => 'products',
-                'label' => Craft::t('searchit', 'Products'),
-                'displayName' => Craft::t('searchit', 'Product'),
-                'sources' => $this->getSupportedSources(Product::class),
-            ];
-        }
+        // Craft::dd(\craft\commerce\Plugin::getInstance());
+
+        // $plugin = Craft::$app->getPlugins()->getPlugin('commerce');
+        // Craft::dd($plugin);
+        // if(Searchit::$plugin->isCommerceEnabled())
+        // {
+
+        //     $types[Product::class] = [
+        //         'class' => Product::class,
+        //         'handle' => 'products',
+        //         'label' => Craft::t('searchit', 'Products'),
+        //         'displayName' => Craft::t('searchit', 'Product'),
+        //         'sources' => $this->getSupportedSources(Product::class),
+        //     ];
+        // }
 
         $this->_supportedElementTypes = $types;
         return $this->_supportedElementTypes;
@@ -301,8 +309,7 @@ class ElementFilters extends Component
         $record->source = $model->source;
         $record->name = $model->name;
         $record->filterType = $model->filterType;
-        $record->manual = $model->manual;
-        $record->dynamic = $model->dynamic;
+        $record->settings = $model->settings;
 
         $maxSortOrder = (new Query())
             ->from(['{{%searchit_elementfilters}}'])
@@ -356,7 +363,12 @@ class ElementFilters extends Component
 
     public function createElementFilter(array $config = []): ElementFilter
     {
-        $config['manual'] = is_string($config['manual']) ? Json::decodeIfJson($config['manual'], true) : ($config['manual'] ?? null);
+        switch ($config['filterType'] ?? false)
+        {
+            case 'manual':
+                $config['settings'] = is_string($config['settings']) ? Json::decodeIfJson($config['settings'], true) : ($config['settings'] ?? []);
+                break;
+        }
         return new ElementFilter($config);
     }
 
@@ -408,8 +420,7 @@ class ElementFilters extends Component
                 'source',
                 'name',
                 'filterType',
-                'manual',
-                'dynamic',
+                'settings',
                 'sortOrder',
             ])
             ->from(['{{%searchit_elementfilters}}'])

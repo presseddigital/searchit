@@ -41,7 +41,27 @@
 	            name: 'compactMode',
 	            on: settings.compactMode,
 	            errors: settings.getErrors('compactMode'),
+	            toggle: '#compactModePreviewOn',
+	            reverseToggle: '#compactModePreviewOff'
 	        }) }}
+
+			<div id="compactModePreviewOn" class="{{ settings.compactMode ? '' : 'hidden' }}">
+		        <div class="elementindex searchit--compactMode searchit--compactMode-on">
+			        {% include "_elements/indexcontainer" with {
+			            showSiteMenu: false,
+			            elementType: 'craft\\elements\\Entry'
+			        } only %}
+			    </div>
+			</div>
+
+			<div id="compactModePreviewOff" class="{{ settings.compactMode ? 'hidden' : '' }}">
+		        <div class="elementindex searchit--compactMode searchit--compactMode-off">
+			        {% include "_elements/indexcontainer" with {
+			            showSiteMenu: false,
+			            elementType: 'craft\\elements\\Entry'
+			        } only %}
+			    </div>
+			</div>
 
 	        {{ forms.textField({
 	            label: 'Max Filter Width'|t('searchit'),

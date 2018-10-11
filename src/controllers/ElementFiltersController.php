@@ -93,8 +93,7 @@ class ElementFiltersController extends Controller
             'source' => $source,
             'name' => $request->getBodyParam('name'),
             'filterType' => $filterType,
-            'manual' => $request->getBodyParam('manual'),
-            'dynamic' => $request->getBodyParam('dynamic'),
+            'settings' => $request->getBodyParam('settings.'.$filterType),
         ]);
 
         if (!$elementFiltersService->saveElementFilter($elementFilter)) {

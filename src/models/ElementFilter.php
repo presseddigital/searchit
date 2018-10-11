@@ -18,9 +18,8 @@ class ElementFilter extends Model
     public $type;
     public $source = '*';
     public $name;
-    public $filterType = 'manual'; // custom, dynamic
-    public $manual;
-    public $dynamic;
+    public $filterType = 'dynamic';
+    public $settings;
     public $sortOrder;
 
     // Public Methods
@@ -28,15 +27,77 @@ class ElementFilter extends Model
 
 	public function rules(): array
     {
-        $filterOptionsRequiredMessage = Craft::t('searchit', 'Filter options cannot be blank');
-
         $rules = parent::rules();
         $rules[] = [['type', 'source', 'name', 'filterType'], 'string'];
         $rules[] = [['type', 'source', 'name', 'filterType'], 'required'];
-        $rules[] = ['manual', 'required', 'when' => [$this, 'isManualFilterType'], 'message' => $filterOptionsRequiredMessage];
-        $rules[] = ['dynamic', 'required', 'when' => [$this, 'isDynamicFilterType'], 'message' => $filterOptionsRequiredMessage];
-
+        $rules[] = ['settings', 'validateSettings', 'skipOnEmpty' => false];
         return $rules;
+    }
+
+    public function validateSettings()
+    {
+        switch ($this->filterType)
+        {
+            case 'dynamic':
+                if(!$this->settings)
+                {
+                    $this->addError('dynamic', Craft::t('searchit', 'Filter options cannot be blank'));
+                }
+                else
+                {
+                    try {
+                        Craft::$app->getView()->renderString($this->settings);
+                    } catch (\Twig_Error_Syntax $e) {
+                        $this->addError('dynamic', Craft::t('searchit', 'Looks like you have errors in you twig syntax'));
+                    }
+                }
+                break;
+
+            case 'manual':
+                if(!is_array($this->settings) || empty($this->settings))
+                {
+                    $this->addError('manual', Craft::t('searchit', 'Filter options cannot be blank'));
+                }
+                else
+                {
+                    foreach ($this->settings as $i => $row)
+                    {
+                        $label = $row['label'] ?? '';
+                        if(!$label)
+                        {
+                            $labelError = true;
+                            $this->addError('manual', Craft::t('searchit', 'Row {row} {error}', [
+                                'row' => ($i + 1),
+                                'error' => Craft::t('searchit', 'label cannot be blank'),
+                            ]));
+                        }
+
+                        $filter = $row['filter'] ?? '';
+                        if(!$filter)
+                        {
+                            $filterError = true;
+                            $this->addError('manual', Craft::t('searchit', 'Row {row} {error}', [
+                                'row' => ($i + 1),
+                                'error' => Craft::t('searchit', 'filter cannot be blank'),
+                            ]));
+                        }
+
+                        $this->settings[$i] = [
+                            'label' => [
+                                'value' => $label,
+                                'hasErrors' => $labelError ?? '',
+                            ],
+                            'filter' => [
+                                'value' => $filter,
+                                'hasErrors' => $filterError ?? '',
+                            ]
+                        ];
+
+                    }
+                }
+                break;
+        }
+
     }
 
     public function isManualFilterType()
@@ -59,10 +120,17 @@ class ElementFilter extends Model
         switch ($this->filterType)
         {
             case 'manual':
-                $filters = $this->manual;
+                $filters = $this->settings;
                 foreach ($filters as $k => $v)
                 {
-                    $filters[$k]['filter'] = Json::decodeIfJson($v['filter'], true);
+                    if($v['filter']['value'] ?? false)
+                    {
+                         $filters[$k]['filter'] = Json::decodeIfJson($filters[$k]['filter']['value'], true);
+                    }
+                    else
+                    {
+                        $filters[$k]['filter'] = Json::decodeIfJson($filters[$k]['filter'], true);
+                    }
                 }
                 break;
 
@@ -70,7 +138,11 @@ class ElementFilter extends Model
                 $view = Craft::$app->getView();
                 $currentTemplateMode = $view->getTemplateMode();
                 $view->setTemplateMode($view::TEMPLATE_MODE_SITE);
-                $filters = is_string($this->dynamic) ? Json::decodeIfJson('[' . Craft::$app->getView()->renderString($this->dynamic) . ']', true) : [];
+                try {
+                    $filters = is_string($this->settings) ? Json::decodeIfJson('[' . Craft::$app->getView()->renderString($this->settings) . ']', true) : [];
+                } catch (\Exception $e) {
+                    $filters = [];
+                }
                 $view->setTemplateMode($currentTemplateMode);
                 break;
         }

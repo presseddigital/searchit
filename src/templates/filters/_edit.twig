@@ -5,16 +5,17 @@
 
 {% block content %}
 
-    {#
-    {{ d(elementFilter.getErrors()) }}
-    {{ d(elementFilter) }}
-    #}
+
+        {{ d(elementFilter.getErrors()) }}
+        {{ d(elementFilter) }}
+
 
     <input type="hidden" name="action" value="searchit/element-filters/save">
 
     {% if not isNewElementFilter %}
         <input type="hidden" name="elementFilterId" value="{{ elementFilter.id }}">
     {% endif %}
+
     <input type="hidden" name="type" value="{{ elementType }}">
     <input type="hidden" name="source" value="{{ source.key }}">
 
@@ -28,7 +29,7 @@
         name: 'name',
         placeholder: '',
         value: elementFilter.name ?? '',
-        errors: elementFilter.getErrors('name') ?? false,
+        errors: elementFilter.getErrors('name') ?? '',
         first: true
     }) }}
 
@@ -38,51 +39,26 @@
         id: 'filterType',
         name: 'filterType',
         options: {
-            manual: 'Manual'|t('searchit'),
             dynamic: 'Dynamic'|t('searchit'),
+            manual: 'Manual'|t('searchit'),
         },
         value: elementFilter.filterType,
-        toggle: true
+        toggle: true,
+        errors: elementFilter.getErrors('filterType') ?? '',
     }) }}
 
     <hr>
-
-    <div id="{{ 'manual'|id }}" {% if elementFilter.filterType != 'manual' %} class="hidden"{% endif %}>
-
-        {{ forms.editableTableField({
-            id: 'manualSettings',
-            name: 'manual',
-            label: 'Filter Options'|t('searchit'),
-            instructions: "Specify this filters dropdown options."|t('searchit'),
-            rows: elementFilter.filterType == 'manual' ? (elementFilter.manual ?? []) : [],
-            textual: false,
-            addRowLabel: 'Add filter'|t('searchit'),
-            cols: {
-                label: {
-                    heading: 'Label'|t('searchit'),
-                    type: 'singleline',
-                    width: '30%',
-                },
-                filter: {
-                    heading: 'Criteria (JSON)'|t('searchit'),
-                    type: 'singleline',
-                }
-            },
-            errors: elementFilter.getErrors('manual') ?? false,
-        }) }}
-
-    </div>
 
     <div id="{{ 'dynamic'|id }}" {% if elementFilter.filterType != 'dynamic' %} class="hidden"{% endif %}>
 
         {{ forms.textareaField({
             id: 'dynamicSettings',
-            name: 'dynamic',
+            name: 'settings[dynamic]',
             label: 'Filter Options'|t('searchit'),
             instructions: 'Use json or twig to define this filters options.'|t('searchit'),
             rows: 14,
             class: 'code',
-            value: elementFilter.filterType == 'dynamic' ? (elementFilter.dynamic ?? '') : '',
+            value: elementFilter.filterType == 'dynamic' ? (elementFilter.settings ?? '') : '',
             errors: elementFilter.getErrors('dynamic') ?? false,
         }) }}
 
@@ -128,6 +104,32 @@
             </p>
 
         {% endverbatim %}
+
+    </div>
+
+    <div id="{{ 'manual'|id }}" {% if elementFilter.filterType != 'manual' %} class="hidden"{% endif %}>
+
+        {{ forms.editableTableField({
+            id: 'manualSettings',
+            name: 'settings[manual]',
+            label: 'Filter Options'|t('searchit'),
+            instructions: "Specify this filters dropdown options."|t('searchit'),
+            rows: elementFilter.filterType == 'manual' ? (elementFilter.settings ?? []) : [],
+            textual: false,
+            addRowLabel: 'Add filter'|t('searchit'),
+            cols: {
+                label: {
+                    heading: 'Label'|t('searchit'),
+                    type: 'singleline',
+                    width: '30%',
+                },
+                filter: {
+                    heading: 'JSON Criteria or String'|t('searchit'),
+                    type: 'singleline',
+                }
+            },
+            errors: elementFilter.getErrors('manual') ?? false,
+        }) }}
 
     </div>
 
