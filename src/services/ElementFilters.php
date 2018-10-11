@@ -3,6 +3,7 @@ namespace fruitstudios\searchit\services;
 
 use fruitstudios\searchit\Searchit;
 use fruitstudios\searchit\models\ElementFilter;
+use fruitstudios\searchit\models\SourceSettings;
 use fruitstudios\searchit\records\ElementFilter as ElementFilterRecord;
 use fruitstudios\searchit\helpers\ElementHelper;
 
@@ -222,6 +223,7 @@ class ElementFilters extends Component
                 $supportedSources = $supportedElementType['sources'] ?? [];
                 foreach ($supportedSources as $supportedSource)
                 {
+                    $_sourceSettings = $this->getSourceSettings($supportedElementType['handle'], $supportedSource['handle']);
                     $_filters = [];
                     switch ($supportedSource['key'])
                     {
@@ -233,7 +235,11 @@ class ElementFilters extends Component
                             break;
                         default:
                             $elementFilters = $this->_elementFiltersBySource[$supportedElementType['class']][$supportedSource['key']] ?? [];
-                            $_filters = array_merge($globalFilters, $this->_elementFiltersAsArrayOfFilters($elementFilters));
+                            if (!$_sourceSettings->hideGlobalFilters)
+                            {
+                                $_filters = $globalFilters;
+                            }
+                            $_filters = array_merge($_filters, $this->_elementFiltersAsArrayOfFilters($elementFilters));
                             break;
                     }
 
@@ -352,6 +358,34 @@ class ElementFilters extends Component
     {
         $config['manual'] = is_string($config['manual']) ? Json::decodeIfJson($config['manual'], true) : ($config['manual'] ?? null);
         return new ElementFilter($config);
+    }
+
+    public function saveSourceSettings(SourceSettings $sourceSettings, bool $runValidation = true): bool
+    {
+        if ($runValidation && !$sourceSettings->validate())
+        {
+            Craft::info('Element filter not saved due to validation error.', __METHOD__);
+            return false;
+        }
+
+        $settings = Searchit::$settings;
+
+        $sources = $settings->sources;
+        $sources[$sourceSettings->type][$sourceSettings->source] = $sourceSettings->getAttributes();
+
+        return Craft::$app->getPlugins()->savePluginSettings(Searchit::$plugin, [
+            'sources' => $sources
+        ]);
+    }
+
+    public function getSourceSettings(string $elementTypeHandle, string $sourceHandle): SourceSettings
+    {
+        return new SourceSettings(Searchit::$settings->sources[$elementTypeHandle][$sourceHandle] ?? []);
+    }
+
+    public function createSourceSettings(array $config = []): SourceSettings
+    {
+        return new SourceSettings($config);
     }
 
     // Private Methods

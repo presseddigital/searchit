@@ -15,6 +15,7 @@ class Settings extends Model
 	public $hasCpSectionOverride = false;
     public $compactMode = true;
     public $maxFilterWidth;
+    public $sources;
 
     // Public Methods
     // =========================================================================

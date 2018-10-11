@@ -68,6 +68,9 @@
 
     <div class="buttons">
         <a href="{{ url('searchit/filters/'~element.handle~'/'~source.handle~'/new') }}" class="btn submit add icon">{{ 'New Filter'|t('searchit') }}</a>
+        {% if elementFilters|length and source.handle != 'global' %}
+            <a href="{{ url('searchit/filters/'~element.handle~'/'~source.handle~'/settings') }}" class="btn settings icon">{{ 'Settings'|t('app') }}</a>
+        {% endif %}
     </div>
 
 {% endblock %}

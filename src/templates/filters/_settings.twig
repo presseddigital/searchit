@@ -1,0 +1,35 @@
+{% extends "searchit/_layouts/main" %}
+{% import "_includes/forms" as forms %}
+
+{% set fullPageForm = true %}
+
+{% block content %}
+
+    <h2>{{ source.label }} {{ element.displayName }} {{ 'Source Settings'|t('searchit') }}</h2>
+
+    <input type="hidden" name="action" value="searchit/element-filters/save-source-settings">
+
+    <input type="hidden" name="type" value="{{ element.handle }}">
+    <input type="hidden" name="source" value="{{ source.handle }}">
+
+    {{ redirectInput('searchit/filters/'~elementTypeHandle~'/'~sourceHandle) }}
+    {{ csrfInput() }}
+
+    {% if source.handle != 'global' %}
+
+        {{ forms.lightswitchField({
+            label: 'Hide Global Filters'|t('searchit'),
+            instructions: 'Hide the global filters on this view?'|t('searchit'),
+            id: 'hideGlobalFilters',
+            name: 'hideGlobalFilters',
+            on: sourceSettings.hideGlobalFilters ?? false,
+            errors: sourceSettings.getErrors('hideGlobalFilters'),
+        }) }}
+
+    {% endif %}
+
+    <div class="buttons">
+        <input type="submit" class="btn submit" value="{{ 'Save'|t('searchit') }}">
+    </div>
+
+{% endblock %}
