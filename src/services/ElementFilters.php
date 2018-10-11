@@ -104,6 +104,8 @@ class ElementFilters extends Component
         // if(Searchit::$plugin->isCommerceEnabled())
         // {
 
+        // if(Searchit::$commerceInstalled)
+        // {
         //     $types[Product::class] = [
         //         'class' => Product::class,
         //         'handle' => 'products',
