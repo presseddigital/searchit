@@ -94,16 +94,16 @@ class ElementFilters extends Component
             'sources' => $this->getSupportedSources(Asset::class),
         ];
 
-        if(Searchit::$commerceInstalled)
-        {
-            $types[Product::class] = [
-                'class' => Product::class,
-                'handle' => 'products',
-                'label' => Craft::t('searchit', 'Products'),
-                'displayName' => Craft::t('searchit', 'Product'),
-                'sources' => $this->getSupportedSources(Product::class),
-            ];
-        }
+        // if(Searchit::$commerceInstalled)
+        // {
+        //     $types[Product::class] = [
+        //         'class' => Product::class,
+        //         'handle' => 'products',
+        //         'label' => Craft::t('searchit', 'Products'),
+        //         'displayName' => Craft::t('searchit', 'Product'),
+        //         'sources' => $this->getSupportedSources(Product::class),
+        //     ];
+        // }
 
         $this->_supportedElementTypes = $types;
         return $this->_supportedElementTypes;
