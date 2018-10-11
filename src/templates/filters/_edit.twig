@@ -82,7 +82,7 @@
             instructions: 'Use json or twig to define this filters options.'|t('searchit'),
             rows: 14,
             class: 'code',
-            value: elementFilter.filterType == 'dynamic' ? (elementFilter.settings ?? '') : '',
+            value: elementFilter.filterType == 'dynamic' ? (elementFilter.dynamic ?? '') : '',
             errors: elementFilter.getErrors('dynamic') ?? false,
         }) }}
 
