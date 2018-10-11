@@ -6,6 +6,7 @@ use fruitstudios\searchit\Searchit;
 use Craft;
 use craft\base\Model;
 use craft\helpers\Json;
+use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
 use craft\db\Query;
 
@@ -62,8 +63,10 @@ class ElementFilter extends Model
                 {
                     foreach ($this->settings as $i => $row)
                     {
+
+                        $labelError = false;
                         $label = $row['label'] ?? '';
-                        if(!$label)
+                        if($label == '')
                         {
                             $labelError = true;
                             $this->addError('manual', Craft::t('searchit', 'Row {row} {error}', [
@@ -72,8 +75,9 @@ class ElementFilter extends Model
                             ]));
                         }
 
+                        $filterError = false;
                         $filter = $row['filter'] ?? '';
-                        if(!$filter)
+                        if($filter == '')
                         {
                             $filterError = true;
                             $this->addError('manual', Craft::t('searchit', 'Row {row} {error}', [
@@ -81,14 +85,29 @@ class ElementFilter extends Model
                                 'error' => Craft::t('searchit', 'filter cannot be blank'),
                             ]));
                         }
+                        else
+                        {
+                            if(StringHelper::containsAny($filter, ['{', '"', '}']))
+                            {
+                                $decoded = Json::decodeIfJson($filter, true);
+                                if(!is_array($decoded))
+                                {
+                                    $filterError = true;
+                                    $this->addError('manual', Craft::t('searchit', 'Row {row} {error}', [
+                                        'row' => ($i + 1),
+                                        'error' => Craft::t('searchit', 'filter contains invalid json'),
+                                    ]));
+                                }
+                            }
+                        }
 
                         $this->settings[$i] = [
                             'label' => [
-                                'value' => $label,
+                                'value' => $label ?? '',
                                 'hasErrors' => $labelError ?? '',
                             ],
                             'filter' => [
-                                'value' => $filter,
+                                'value' => $filter ?? '',
                                 'hasErrors' => $filterError ?? '',
                             ]
                         ];
@@ -97,6 +116,9 @@ class ElementFilter extends Model
                 }
                 break;
         }
+
+        // Validate Options
+        $options = $this->getOptions();
 
     }
 
@@ -121,16 +143,11 @@ class ElementFilter extends Model
         {
             case 'manual':
                 $filters = $this->settings;
+
                 foreach ($filters as $k => $v)
                 {
-                    if($v['filter']['value'] ?? false)
-                    {
-                         $filters[$k]['filter'] = Json::decodeIfJson($filters[$k]['filter']['value'], true);
-                    }
-                    else
-                    {
-                        $filters[$k]['filter'] = Json::decodeIfJson($filters[$k]['filter'], true);
-                    }
+                    $filters[$k]['label'] = $v['label']['value'] ?? $v['label'];
+                    $filters[$k]['filter'] = Json::decodeIfJson(($v['label']['value'] ?? $v['label']), true);
                 }
                 break;
 
@@ -139,7 +156,7 @@ class ElementFilter extends Model
                 $currentTemplateMode = $view->getTemplateMode();
                 $view->setTemplateMode($view::TEMPLATE_MODE_SITE);
                 try {
-                    $filters = is_string($this->settings) ? Json::decodeIfJson('[' . Craft::$app->getView()->renderString($this->settings) . ']', true) : [];
+                    $filters = Json::decodeIfJson('[' . Craft::$app->getView()->renderString($this->settings) . ']', true);
                 } catch (\Exception $e) {
                     $filters = [];
                 }

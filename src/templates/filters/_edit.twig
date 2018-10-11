@@ -5,11 +5,6 @@
 
 {% block content %}
 
-
-        {{ d(elementFilter.getErrors()) }}
-        {{ d(elementFilter) }}
-
-
     <input type="hidden" name="action" value="searchit/element-filters/save">
 
     {% if not isNewElementFilter %}
@@ -124,7 +119,7 @@
                     width: '30%',
                 },
                 filter: {
-                    heading: 'JSON Criteria or String'|t('searchit'),
+                    heading: 'Filter (JSON Criteria or Search String)'|t('searchit'),
                     type: 'singleline',
                 }
             },

@@ -100,11 +100,7 @@ class ElementFilters extends Component
         // Craft::dd(\craft\commerce\Plugin::getInstance());
 
         // $plugin = Craft::$app->getPlugins()->getPlugin('commerce');
-        // Craft::dd($plugin);
         // if(Searchit::$plugin->isCommerceEnabled())
-        // {
-
-        // if(Searchit::$commerceInstalled)
         // {
         //     $types[Product::class] = [
         //         'class' => Product::class,
@@ -218,52 +214,59 @@ class ElementFilters extends Component
     public function getActiveElementFiltersArray(string $type = null)
     {
         $filters = [];
-        $this->getAllElementFilters();
+        try{
+            $this->getAllElementFilters();
 
-        $supportedElementTypes = $this->getSupportedElementTypes();
-        if($supportedElementTypes)
-        {
-            foreach ($supportedElementTypes as $supportedElementType)
+            $supportedElementTypes = $this->getSupportedElementTypes();
+            if($supportedElementTypes)
             {
-                // Global Filters
-                $globalElementFilters = $this->_elementFiltersBySource[$supportedElementType['class']][self::GLOBAL_SOURCE_KEY] ?? false;
-                $globalFilters = $globalElementFilters ? $this->_elementFiltersAsArrayOfFilters($globalElementFilters) : [];
-
-                // Sources
-                $supportedSources = $supportedElementType['sources'] ?? [];
-                foreach ($supportedSources as $supportedSource)
+                foreach ($supportedElementTypes as $supportedElementType)
                 {
-                    $_sourceSettings = $this->getSourceSettings($supportedElementType['handle'], $supportedSource['handle']);
-                    $_filters = [];
-                    switch ($supportedSource['key'])
-                    {
-                        case self::GLOBAL_SOURCE_KEY:
-                            if($globalFilters)
-                            {
-                                $_filters = $globalFilters;
-                            }
-                            break;
-                        default:
-                            $elementFilters = $this->_elementFiltersBySource[$supportedElementType['class']][$supportedSource['key']] ?? [];
-                            if (!$_sourceSettings->hideGlobalFilters)
-                            {
-                                $_filters = $globalFilters;
-                            }
-                            $_filters = array_merge($_filters, $this->_elementFiltersAsArrayOfFilters($elementFilters));
-                            break;
-                    }
+                    // Global Filters
+                    $globalElementFilters = $this->_elementFiltersBySource[$supportedElementType['class']][self::GLOBAL_SOURCE_KEY] ?? false;
+                    $globalFilters = $globalElementFilters ? $this->_elementFiltersAsArrayOfFilters($globalElementFilters) : [];
 
-                    if(!empty($_filters))
+                    // Sources
+                    $supportedSources = $supportedElementType['sources'] ?? [];
+                    foreach ($supportedSources as $supportedSource)
                     {
-                        $filters[] = [
-                            'elementType' => $supportedElementType['class'],
-                            'source' => $supportedSource['key'],
-                            'filters' => $_filters
-                        ];
+                        $_sourceSettings = $this->getSourceSettings($supportedElementType['handle'], $supportedSource['handle']);
+                        $_filters = [];
+                        switch ($supportedSource['key'])
+                        {
+                            case self::GLOBAL_SOURCE_KEY:
+                                if($globalFilters)
+                                {
+                                    $_filters = $globalFilters;
+                                }
+                                break;
+                            default:
+                                $elementFilters = $this->_elementFiltersBySource[$supportedElementType['class']][$supportedSource['key']] ?? [];
+                                if (!$_sourceSettings->hideGlobalFilters)
+                                {
+                                    $_filters = $globalFilters;
+                                }
+                                $_filters = array_merge($_filters, $this->_elementFiltersAsArrayOfFilters($elementFilters));
+                                break;
+                        }
+
+                        if(!empty($_filters))
+                        {
+                            $filters[] = [
+                                'elementType' => $supportedElementType['class'],
+                                'source' => $supportedSource['key'],
+                                'filters' => $_filters
+                            ];
+                        }
                     }
                 }
             }
+        } catch(\Exception $e) {
+            Craft::error('An error occurred when generating searchit filters: ' . $e->getMessage(), __METHOD__);
+            return $filters;
         }
+
+
 
         return $filters;
     }
