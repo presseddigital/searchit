@@ -9,20 +9,19 @@ This plugin gives your CP users an extensive tool for searching/ filtering entri
 
 Uses and extends the Craft CP element [search](https://docs.craftcms.com/v3/searching.html)
 
+## Examples
+
+You have two ways to setup filters. Manually or dynamically.
+
+#### Assets
+
+#### Entries
+
+#### Categories
+
+
+
 Tip: As with the regular Craft Search, if you suspect that your search indexes don’t have the latest and greatest data, you can have Craft rebuild them with the Rebuild Search Indexes tool in Settings.
-
-### In Use
-
-Creating a search filter.
-
-
-Creating a dynamic search filter.
-
-
-Ordering filters.
-
-
-Settings and globals.
 
 
 Brought to you by [Fruit Studios](https://fruitstudios.co.uk)
