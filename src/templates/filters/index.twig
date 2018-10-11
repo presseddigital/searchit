@@ -1,0 +1,88 @@
+{% extends "searchit/_layouts/main" %}
+{% import "_includes/forms" as forms %}
+
+{% set sortable = true %}
+
+{% block content %}
+
+	<h2>{{ source.label }} {{ element.displayName }} {{ 'Filters'|t('searchit') }}</h2>
+
+	{% if source.handle == 'global' %}
+        <p>{{ 'Add filters which will optionally display in all element search toolbars.'|t('searchit') }}</p>
+    {% else %}
+        <p>{{ 'Add filters which will only display in the element search toolbar on the {element} {source} view.'|t('searchit', {
+            element: element.displayName|lower,
+            source: source.label|lower,
+        }) }}</p>
+    {% endif %}
+
+	{#
+	<div id="no-elementFilters"{% if elementFilters|length %} class="hidden"{% endif %}>
+	    <p>{{ "No filters exist yet."|t('searchit') }}</p>
+	</div>
+	#}
+
+	<div class="elementindex" data-element-filter-preview data-type="{{ elementType }}" data-source="{{ source.key }}">
+        {% include "_elements/indexcontainer" with {
+            showSiteMenu: false,
+            elementType: elementType
+        } only %}
+    </div>
+
+	{% if elementFilters|length %}
+
+        <table id="elementFilters" class="data fullwidth collapsible">
+            <thead>
+                <tr>
+                    {% if sortable %}
+                        <td class="thin"></td>
+                    {% endif %}
+                    <th scope="col">{{ "Name"|t('searchit') }}</th>
+                    <th scope="col">{{ "Type"|t('searchit') }}</th>
+                    <th scope="col">{{ "Preview"|t('searchit') }}</th>
+                    <td class="thin"></td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for elementFilter in elementFilters %}
+                    <tr data-id="{{ elementFilter.id }}" data-name="{{ elementFilter.name }}">
+
+                        {% if sortable %}
+                            <td class="thin">
+                                <a class="move icon" title="{{ 'Move'|t('app') }}"></a>
+                            </td>
+                        {% endif %}
+
+                        <th scope="row" data-title="{{ 'Name'|t('searchit') }}">
+                            <a href="{{ url('searchit/filters/'~element.handle~'/'~source.handle~'/'~elementFilter.id) }}">{{ elementFilter.name }}</a>
+                        </th>
+                        <td data-title="{{ 'Type'|t('searchit') }}">{{ elementFilter.filterType|ucfirst }}</td>
+                        <td data-title="{{ 'Preview'|t('searchit') }}">{{ elementFilter.getPreview()|raw }}</td>
+                        <td class="thin"><a class="delete icon" title="{{ 'Delete'|t('searchit') }}" role="button"></a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    {% endif %}
+
+    <div class="buttons">
+        <a href="{{ url('searchit/filters/'~element.handle~'/'~source.handle~'/new') }}" class="btn submit add icon">{{ 'New Filter'|t('searchit') }}</a>
+        {% if elementFilters|length and source.handle != 'global' %}
+            <a href="{{ url('searchit/filters/'~element.handle~'/'~source.handle~'/settings') }}" class="btn settings icon">{{ 'Settings'|t('app') }}</a>
+        {% endif %}
+    </div>
+
+{% endblock %}
+
+{% js %}
+    var adminTable = new Craft.AdminTable({
+        tableSelector: '#elementFilters',
+        noObjectsSelector: '#no-elementFilters',
+        newObjectBtnSelector: '#newElementFilterButtonContainer',
+        deleteAction: 'searchit/element-filters/delete',
+        confirmDeleteMessage: '{{ "Are you sure you want to delete the filter “{name}”?"|t('searchit') }}',
+        sortable: {{ sortable ? 'true' : 'false' }},
+        reorderAction: 'searchit/element-filters/reorder',
+    });
+{% endjs %}

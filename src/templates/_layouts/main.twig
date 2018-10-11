@@ -1,0 +1,25 @@
+{% extends "searchit/_layouts/base" %}
+
+{% set title = "Searchit"|t('searchit') %}
+
+{% set navItems = craft.searchit.cp.nav() %}
+
+{% set selectedItemHandle = selectedItem ?? craft.app.request.getSegment(2)~(craft.app.request.getSegment(3) ? '/'~craft.app.request.getSegment(3))~(craft.app.request.getSegment(4) ? '/'~craft.app.request.getSegment(4)) %}
+
+{% set docTitle = ((navItems[selectedItemHandle] ?? false) ? navItems[selectedItemHandle].title ~' - ')~title %}
+
+{% block sidebar %}
+    <nav>
+        <ul>
+            {% for handle, item in navItems %}
+                {% if item.heading is defined %}
+                    <li class="heading"><span>{{ item.heading }}</span></li>
+                {% else %}
+                    <li>
+                        <a href="{{ url('searchit/'~handle) }}"{% if handle == selectedItemHandle %} class="sel"{% endif %}>{{ item.title }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </nav>
+{% endblock %}

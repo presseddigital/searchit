@@ -1,0 +1,138 @@
+{% extends "searchit/_layouts/main" %}
+{% import "_includes/forms" as forms %}
+
+{% set fullPageForm = true %}
+
+{% block content %}
+
+    {#
+    {{ d(elementFilter.getErrors()) }}
+    {{ d(elementFilter) }}
+    #}
+
+    <input type="hidden" name="action" value="searchit/element-filters/save">
+
+    {% if not isNewElementFilter %}
+        <input type="hidden" name="elementFilterId" value="{{ elementFilter.id }}">
+    {% endif %}
+    <input type="hidden" name="type" value="{{ elementType }}">
+    <input type="hidden" name="source" value="{{ source.key }}">
+
+    {{ redirectInput('searchit/filters/'~elementTypeHandle~'/'~sourceHandle) }}
+    {{ csrfInput() }}
+
+    {{ forms.textField({
+        label: 'Filter Name'|t('searchit'),
+        instructions: 'Give your filter a name. NB. Also used to head up your filter select.'|t('searchit'),
+        id: 'name',
+        name: 'name',
+        placeholder: '',
+        value: elementFilter.name ?? '',
+        errors: elementFilter.getErrors('name') ?? false,
+        first: true
+    }) }}
+
+    {{ forms.selectField({
+        label: "Filter Type"|t('searchit'),
+        instructions: "Choose the type of filter to setup."|t('searchit'),
+        id: 'filterType',
+        name: 'filterType',
+        options: {
+            manual: 'Manual'|t('searchit'),
+            dynamic: 'Dynamic'|t('searchit'),
+        },
+        value: elementFilter.filterType,
+        toggle: true
+    }) }}
+
+    <hr>
+
+    <div id="{{ 'manual'|id }}" {% if elementFilter.filterType != 'manual' %} class="hidden"{% endif %}>
+
+        {{ forms.editableTableField({
+            id: 'manualSettings',
+            name: 'manual',
+            label: 'Filter Options'|t('searchit'),
+            instructions: "Specify this filters dropdown options."|t('searchit'),
+            rows: elementFilter.filterType == 'manual' ? (elementFilter.manual ?? []) : [],
+            textual: false,
+            addRowLabel: 'Add filter'|t('searchit'),
+            cols: {
+                label: {
+                    heading: 'Label'|t('searchit'),
+                    type: 'singleline',
+                    width: '30%',
+                },
+                filter: {
+                    heading: 'Criteria (JSON)'|t('searchit'),
+                    type: 'singleline',
+                }
+            },
+            errors: elementFilter.getErrors('manual') ?? false,
+        }) }}
+
+    </div>
+
+    <div id="{{ 'dynamic'|id }}" {% if elementFilter.filterType != 'dynamic' %} class="hidden"{% endif %}>
+
+        {{ forms.textareaField({
+            id: 'dynamicSettings',
+            name: 'dynamic',
+            label: 'Filter Options'|t('searchit'),
+            instructions: 'Use json or twig to define this filters options.'|t('searchit'),
+            rows: 14,
+            class: 'code',
+            value: elementFilter.filterType == 'dynamic' ? (elementFilter.dynamic ?? '') : '',
+            errors: elementFilter.getErrors('dynamic') ?? false,
+        }) }}
+
+        {% verbatim %}
+            <h3>Twig</h3>
+            <p>
+            <pre class="code">{% for user in craft.users.all() %}
+    {{ ({
+        filter: {
+            authorId: user.id
+        },
+        label: user.fullName
+    })|json_encode() }}{{ not loop.last ? ',' }}
+{% endfor %}
+
+{% for category in craft.categories.group('countries').all() %}
+    {{ ({
+        filter: {
+            relatedTo: {
+                element: category.id,
+                field: 'countries'
+            }
+        },
+        label: category.title
+    })|json_encode() }}{{ not loop.last ? ',' }}
+{% endfor %}
+        </pre>
+            </p>
+
+            <h3>Twig Include</h3>
+            <p>
+            <pre class="code">{% include '_includes/filters/rooms' ignore missing %}
+        </pre>
+            </p>
+
+            <h3>JSON</h3>
+            <p>
+            <pre class="code">{ "filter":"page 1", "label":"Page 1" },
+{ "filter":"page 2", "label":"Page 2" },
+{ "filter":"page 3", "label":"Page 3" },
+{ "filter":"page 4", "label":"Page 4" }
+        </pre>
+            </p>
+
+        {% endverbatim %}
+
+    </div>
+
+    <div class="buttons">
+        <input type="submit" class="btn submit" value="{{ 'Save'|t('searchit') }}">
+    </div>
+
+{% endblock %}

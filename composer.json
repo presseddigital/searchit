@@ -1,0 +1,45 @@
+{
+    "name": "fruitstudios/searchit",
+    "description": "Configurable filters for enhanced element search in the Craft CP.",
+    "type": "craft-plugin",
+    "version": "1.0.0",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "searchit",
+        "cp-search",
+        "filters",
+        "search-filters",
+        "search",
+        "elements"
+    ],
+    "support": {
+        "docs": "https://github.com/fruitstudios/craft-searchit/blob/master/README.md",
+        "issues": "https://github.com/fruitstudios/craft-searchit/issues"
+    },
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Fruit Studios",
+            "homepage": "https://fruitstudios.co.uk"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.0.2"
+    },
+    "autoload": {
+        "psr-4": {
+          "fruitstudios\\searchit\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "Searchit",
+        "handle": "searchit",
+        "hasCpSettings": true,
+        "hasCpSection": false,
+        "changelogUrl": "https://raw.githubusercontent.com/fruitstudios/craft-searchit/master/CHANGELOG.md",
+        "class": "fruitstudios\\searchit\\Searchit"
+    }
+}
