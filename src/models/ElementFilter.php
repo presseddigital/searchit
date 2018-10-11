@@ -37,6 +37,10 @@ class ElementFilter extends Model
 
     public function validateSettings()
     {
+        $view = Craft::$app->getView();
+        $currentTemplateMode = $view->getTemplateMode();
+        $view->setTemplateMode($view::TEMPLATE_MODE_SITE);
+
         switch ($this->filterType)
         {
             case 'dynamic':
@@ -48,7 +52,7 @@ class ElementFilter extends Model
                 {
                     try {
                         Craft::$app->getView()->renderString($this->settings);
-                    } catch (\Twig_Error_Syntax $e) {
+                    } catch (\Exception $e) {
                         $this->addError('dynamic', Craft::t('searchit', 'Looks like you have errors in you twig syntax'));
                     }
                 }
@@ -120,6 +124,7 @@ class ElementFilter extends Model
         // Validate Options
         $options = $this->getOptions();
 
+        $view->setTemplateMode($currentTemplateMode);
     }
 
     public function isManualFilterType()
@@ -156,7 +161,7 @@ class ElementFilter extends Model
                 $currentTemplateMode = $view->getTemplateMode();
                 $view->setTemplateMode($view::TEMPLATE_MODE_SITE);
                 try {
-                    $filters = Json::decodeIfJson('[' . Craft::$app->getView()->renderString($this->settings) . ']', true);
+                    $filters = Json::decodeIfJson('[' . $view->renderString($this->settings) . ']', true);
                 } catch (\Exception $e) {
                     $filters = [];
                 }
