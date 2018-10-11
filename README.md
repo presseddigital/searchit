@@ -3,19 +3,77 @@
 
 # Searchit plugin for Craft CMS 3
 
-Configure powerful custom filters for an enhanced search in the Craft CMS control panel.
+Configure powerful custom filters for an enhanced search experience in the Craft CMS control panel. Harness the power of twig and element queries to create endless filtering options. Keep your clients happy!
+
+See it in action...
 
 <p align="left"><a href="https://www.youtube.com/watch?v=CYzaND0IGPw" target="_blank"><img width="600" src="resources/img/searchit-promo.png" alt="Searchit Promo Video"></a></p>
 
+## Creating a filter
+
+Filters can be produced manually or dynamically and are made up of a JSON array containing rows with a label key `(string)` and a filter key `(string or valid JSON)`. If the filter contains a `string` then it will pass that value to the `search` parameter on the element search. If you pass JSON to the filter than you can create multiple query parameters.
+
+**Creating a filter**
+<p align="left"><img width="600px" src="resources/img/searchit-new.png" alt="New Filter"></a></p>
+
+**Ordering and preview**
+<p align="left"><img width="600px" src="resources/img/searchit-config.png" alt="Configuration"></a></p>
+
+You have two ways to setup filters. Manually or dynamically.
+
+#### Using Twig (Recommended)
+
+You can use the power of twig templating to create your filters. For example, if you want a filter entries by authors, then you can use the following...
+```php
+{% for user in craft.users.all() %}
+    {{ ({
+        filter: {
+            authorId: user.id
+        },
+        label: user.fullName
+    })|json_encode() }}{{ not loop.last ? ',' }}
+{% endfor %}
+```
+
+This essentially creates an element query like so...
+
+```
+{{ craft.entries.authorId(user.id).all() }}
+```
+
+#### Using JSON
+
+Create a valid JSON array to build a filter
+
+```json
+{ "filter":"page 1", "label":"Page 1" },
+{ "filter":"page 2", "label":"Page 2" },
+{ "filter":"page 3", "label":"Page 3" },
+{ "filter":"page 4", "label":"Page 4" }
+```
+
+As the filter value is passing a string, this is essentially creating an element query like so...
+```
+{{ craft.entries.search('page 1').all() }}
+```
+
+#### As an include
+If you prefer to keep your code in your templates/repo, then you can link directly to templates.
+```
+{% include '_includes/filters/rooms' ignore missing %}
+```
+
 ## Example usage
+Here are a few examples of different filters for different elements. The possibilities are endless!
 
 ### Entries
 
 Create filters for authors, date, categories, etc..
 
+*Example:  Filter by author...*
 <p align="left"><img width="600px" src="resources/img/searchit-entries.png" alt="Entries"></a></p>
 
-How to get this filter...
+*How to get this filter...*
 
 ```
 {% for user in craft.users.all() %}
@@ -32,9 +90,10 @@ How to get this filter...
 
 Create filters to narrow down categories by heirarchy.
 
+*Example:  Filter by top level category...*
 <p align="left"><img width="600px" src="resources/img/searchit-categories.png" alt="Categories"></a></p>
 
-How to get this filter...
+*How to get this filter...*
 
 ```
 {% for category in craft.categories.group(‘alcoholicDrinks’).level(1).all() %}
@@ -50,9 +109,10 @@ How to get this filter...
 ### Assets
 Create filters for file types, extensions etc.
 
+*Example:  Filter file type and extensions...*
 <p align="left"><img width="600px" src="resources/img/searchit-assets.png" alt="Assets"></a></p>
 
-How to get these filters...
+*How to get these filters...*
 
 **Kind filter**
 ```json
@@ -66,66 +126,8 @@ How to get these filters...
 { "filter":"extension:gif", "label":"GIF" }
 ```
 
-
-## Creating a filter
-
-Filters can be produced manually or dynamically and are made up of a JSON array containing rows with a label key `(string)` and a filter key `(string or valid JSON)`. If the filter contains a `string` then it will pass that value to the `search` parameter on the element search. If you pass JSON to the filter than you can create multiple parameters.
-
-<p align="left"><img width="600px" src="resources/img/searchit-new.png" alt="New Filter"></a></p>
-<p align="left"><img width="600px" src="resources/img/searchit-config.png" alt="Configuration"></a></p>
-
-You have two ways to setup filters. Manually or dynamically.
-
-#### Using Twig (Recommended)
-```php
-{% for category in craft.categories.group('countries').all() %}
-    {{ ({
-        filter: {
-            relatedTo: {
-                element: category.id,
-                field: 'countries'
-            }
-        },
-        label: category.title
-    })|json_encode() }}{{ not loop.last ? ',' }}
-{% endfor %}
-```
-
-```php
-{% for user in craft.users.all() %}
-    {{ ({
-        filter: {
-            authorId: user.id
-        },
-        label: user.fullName
-    })|json_encode() }}{{ not loop.last ? ',' }}
-{% endfor %}
-```
-
-```php
- {{ ({ label: user.fullName filter: {authorId: user.id},})|json_encode() }}{{ not loop.last ? ',' }}
-```
-
-```
-{{ craft.entries.section('').authorId('1').all() }}
-```
-
-#### Using JSON
-```json
-{ "filter":"page 1", "label":"Page 1" },
-{ "filter":"page 2", "label":"Page 2" },
-{ "filter":"page 3", "label":"Page 3" },
-{ "filter":"page 4", "label":"Page 4" }
-```
-
-```
-{{ craft.entries.section('').search('page 1').all() }}
-```
-
-#### As an include
-```
-{% include '_includes/filters/rooms' ignore missing %}
-```
+## Roadmap
+Support for Commerce comming very soon
 
 #### Useful Resources
 Craft CMS Search Documentation [Docs](https://docs.craftcms.com/v3/searching.html)
