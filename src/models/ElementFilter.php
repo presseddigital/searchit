@@ -152,7 +152,7 @@ class ElementFilter extends Model
                 foreach ($filters as $k => $v)
                 {
                     $filters[$k]['label'] = $v['label']['value'] ?? $v['label'];
-                    $filters[$k]['filter'] = Json::decodeIfJson(($v['label']['value'] ?? $v['label']), true);
+                    $filters[$k]['filter'] = Json::decodeIfJson(($v['filter']['value'] ?? $v['filter']), true);
                 }
                 break;
 
