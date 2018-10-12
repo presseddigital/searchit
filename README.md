@@ -132,8 +132,10 @@ Create filters for file types, extensions etc.
 [Asset Queries](https://docs.craftcms.com/v3/dev/element-queries/asset-queries.html#parameters)<br/>
 [User Queries](https://docs.craftcms.com/v3/dev/element-queries/user-queries.html#parameters)<br/>
 [Category Queries](https://docs.craftcms.com/v3/dev/element-queries/category-queries.html#parameters)<br/>
+
 [Product Queries](https://github.com/craftcms/commerce-docs/blob/v2/en/craft-products.md)<br/>
 [Order Queries](https://github.com/craftcms/commerce-docs/blob/v2/en/craft-orders.md)<br/>
+[Subscription Queries](https://github.com/craftcms/commerce-docs/blob/v2/en/craft-subscriptions.md)<br/>
 
 Also see the Craft CMS Search Documentation [Docs](https://docs.craftcms.com/v3/searching.html)
 
