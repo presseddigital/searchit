@@ -1,34 +1,21 @@
 <?php
-/**
- * Searchit plugin for Craft CMS 3.x
- *
- * A super simple field type which allows you toggle existing field types.
- *
- * @link      https://fruitstudios.co.uk
- * @copyright Copyright (c) 2018 Fruit Studios
- */
-
 namespace fruitstudios\searchit;
 
 use fruitstudios\searchit\models\Settings;
 use fruitstudios\searchit\plugin\Routes as SearchitRoutes;
 use fruitstudios\searchit\plugin\Services as SearchitServices;
 use fruitstudios\searchit\web\twig\CraftVariableBehavior;
-use fruitstudios\searchit\web\assets\searchit\SearchitAssetBundle;
 
 use Craft;
 use craft\base\Plugin;
 use craft\services\Plugins;
-use craft\services\Fields;
-use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
-use craft\helpers\Json;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\PluginEvent;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\View;
 
-use craft\commerce\Plugin as CommercePlugin;
+use craft\commerce\Plugin as Commerce;
 
 use yii\base\Event;
 
@@ -65,9 +52,6 @@ class Searchit extends Plugin
     // Public Methods
     // =========================================================================
 
-    /**
-     * @inheritdoc
-     */
     public function init()
     {
         parent::init();
@@ -76,13 +60,14 @@ class Searchit extends Plugin
         self::$settings = Searchit::$plugin->getSettings();
         self::$devMode = Craft::$app->getConfig()->getGeneral()->devMode;
         self::$view = Craft::$app->getView();
-        self::$commerceInstalled = class_exists(CommercePlugin::class);
+        self::$commerceInstalled = class_exists(Commerce::class);
 
         $this->name = Searchit::$settings->pluginNameOverride;
         $this->hasCpSection = Searchit::$settings->hasCpSectionOverride;
 
         $this->_setPluginComponents(); // See Trait
         $this->_registerCpRoutes(); // See Trait
+
         $this->_addTwigExtensions();
         $this->_registerFieldTypes();
         $this->_registerPermissions();
@@ -91,28 +76,12 @@ class Searchit extends Plugin
         $this->_registerVariables();
         $this->_registerElementTypes();
 
-        if($this->isInstalled)
-        {
-            $this->initElementFilters();
-        }
-
-        // Craft::dd(\craft\commerce\Plugin::getInstance());
-
         Craft::info(Craft::t('searchit', '{name} plugin loaded', ['name' => $this->name]), __METHOD__);
     }
 
     public function beforeInstall(): bool
     {
         return true;
-    }
-
-    public function afterInstallPlugin(PluginEvent $event)
-    {
-        $isCpRequest = Craft::$app->getRequest()->isCpRequest;
-        if ($event->plugin === $this && $isCpRequest)
-        {
-            Craft::$app->controller->redirect(UrlHelper::cpUrl('searchit/about'))->send();
-        }
     }
 
     public function getSettingsResponse()
@@ -130,56 +99,22 @@ class Searchit extends Plugin
         return self::$commerceInstalled && Craft::$app->getPlugins()->isPluginEnabled('commerce');
     }
 
-    public function initElementFilters()
+
+    public function afterInstallPlugin(PluginEvent $event)
     {
-        $request = Craft::$app->getRequest();
-        if($request->isCpRequest)
+        $isCpRequest = Craft::$app->getRequest()->isCpRequest;
+        if($event->plugin === $this && $isCpRequest)
         {
-            $general = Craft::$app->getConfig()->getGeneral();
-            $js = [
-                'id' => StringHelper::UUID(),
-                'filters' => Searchit::$plugin->getElementFilters()->getActiveElementFiltersArray(),
-                'compactMode' => (bool) self::$settings->compactMode,
-                'debug' => $general->devMode,
-                'csrfTokenName' => $general->csrfTokenName,
-                'csrfTokenValue' => $request->getCsrfToken(),
-            ];
+            Craft::$app->controller->redirect(UrlHelper::cpUrl('searchit/about'))->send();
+        }
+    }
 
-            $view = Craft::$app->getView();
-            $view->registerAssetBundle(SearchitAssetBundle::class);
-            $view->registerJs('new ElementFilters('.Json::encode($js).');');
-
-            if(self::$settings->compactMode)
-            {
-                $view->registerCss('
-                    .elementindex:not(.searchit--compactMode) .toolbar .statusmenubtn { font-size: 0; }
-                    .elementindex:not(.searchit--compactMode) .toolbar .statusmenubtn::after { font-size: 14px; }
-                    .elementindex:not(.searchit--compactMode) .toolbar .statusmenubtn .status { vertical-align: middle; margin-right: 0; }
-                    .elementindex:not(.searchit--compactMode) .toolbar .sortmenubtn { font-size: 0; }
-                    .elementindex:not(.searchit--compactMode) .toolbar .sortmenubtn::before,
-                    .elementindex:not(.searchit--compactMode) .toolbar .sortmenubtn::after { font-size: 14px; }
-                    .elementindex:not(.searchit--compactMode) .toolbar .spinner { position: absolute; right: 76px; top: 0px; }
-                    body.ltr .elementindex:not(.searchit--compactMode) .sortmenubtn[data-icon]:not(:empty):before { margin-right: 0; }
-                ');
-            }
-            $view->registerCss('
-                .elementindex.searchit--compactMode-on .toolbar .statusmenubtn { font-size: 0; }
-                .elementindex.searchit--compactMode-on .toolbar .statusmenubtn::after { font-size: 14px; }
-                .elementindex.searchit--compactMode-on .toolbar .statusmenubtn .status { vertical-align: middle; margin-right: 0; }
-                .elementindex.searchit--compactMode-on .toolbar .sortmenubtn { font-size: 0; }
-                .elementindex.searchit--compactMode-on .toolbar .sortmenubtn::before,
-                .elementindex.searchit--compactMode-on .toolbar .sortmenubtn::after { font-size: 14px; }
-                .elementindex.searchit--compactMode-on .toolbar .spinner { position: absolute; right: 76px; top: 0px; }
-                body.ltr .elementindex.searchit--compactMode-on .sortmenubtn[data-icon]:not(:empty):before { margin-right: 0; }
-            ');
-
-
-
-
-            if(self::$settings->maxFilterWidth)
-            {
-                $view->registerCss('.toolbar .searchit--filters select { max-width: '.self::$settings->maxFilterWidth.'px; }');
-            }
+    public function afterLoadPlugins(Event $event)
+    {
+        $isCpRequest = Craft::$app->getRequest()->isCpRequest;
+        if($isCpRequest)
+        {
+            Searchit::$plugin->getElementFilters()->initElementFilters();
         }
     }
 
@@ -222,14 +157,7 @@ class Searchit extends Plugin
     private function _registerEventListeners()
     {
         Event::on(Plugins::class, Plugins::EVENT_AFTER_INSTALL_PLUGIN, [$this, 'afterInstallPlugin']);
-
-        // Event::on(Sites::class, Sites::EVENT_AFTER_SAVE_SITE, [$this->getServiceName(), 'functionToCall']);
-
-        // if (!Craft::$app->getRequest()->getIsConsoleRequest()) {
-        //     Event::on(UserElement::class, UserElement::EVENT_AFTER_SAVE, [$this->getFunction(), 'functionToCall']);
-        //     Event::on(User::class, User::EVENT_AFTER_LOGIN, [$this->getCustomers(), 'loginHandler']);
-        //     Event::on(User::class, User::EVENT_AFTER_LOGOUT, [$this->getCustomers(), 'logoutHandler']);
-        // }
+        Event::on(Plugins::class, Plugins::EVENT_AFTER_LOAD_PLUGINS, [$this, 'afterLoadPlugins']);
     }
 
     private function _registerFieldTypes()

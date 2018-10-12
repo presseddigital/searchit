@@ -6,11 +6,13 @@ use fruitstudios\searchit\models\ElementFilter;
 use fruitstudios\searchit\models\SourceSettings;
 use fruitstudios\searchit\records\ElementFilter as ElementFilterRecord;
 use fruitstudios\searchit\helpers\ElementHelper;
+use fruitstudios\searchit\web\assets\searchit\SearchitAssetBundle;
 
 use Craft;
 use craft\base\Component;
 use craft\db\Query;
 use craft\helpers\Json;
+use craft\helpers\StringHelper;
 
 use craft\elements\Category;
 use craft\elements\Entry;
@@ -18,8 +20,7 @@ use craft\elements\User;
 use craft\elements\Asset;
 
 use craft\commerce\elements\Product;
-
-use craft\commerce\Plugin as CommercePlugin;
+use craft\commerce\elements\Order;
 
 class ElementFilters extends Component
 {
@@ -42,6 +43,58 @@ class ElementFilters extends Component
 
     // Public Methods
     // =========================================================================
+
+    public function initElementFilters()
+    {
+        $request = Craft::$app->getRequest();
+        if($request->isCpRequest)
+        {
+            $settings = Searchit::$settings;
+            $general = Craft::$app->getConfig()->getGeneral();
+            $js = [
+                'id' => StringHelper::UUID(),
+                'filters' => $this->getActiveElementFiltersArray(),
+                'compactMode' => (bool) $settings->compactMode,
+                'debug' => $general->devMode,
+                'csrfTokenName' => $general->csrfTokenName,
+                'csrfTokenValue' => $request->getCsrfToken(),
+            ];
+
+            $view = Craft::$app->getView();
+            $view->registerAssetBundle(SearchitAssetBundle::class);
+            $view->registerJs('new ElementFilters('.Json::encode($js).');');
+
+            if($settings->compactMode)
+            {
+                $view->registerCss('
+                    .elementindex:not(.searchit--compactMode) .toolbar .statusmenubtn { font-size: 0; }
+                    .elementindex:not(.searchit--compactMode) .toolbar .statusmenubtn::after { font-size: 14px; }
+                    .elementindex:not(.searchit--compactMode) .toolbar .statusmenubtn .status { vertical-align: middle; margin-right: 0; }
+                    .elementindex:not(.searchit--compactMode) .toolbar .sortmenubtn { font-size: 0; }
+                    .elementindex:not(.searchit--compactMode) .toolbar .sortmenubtn::before,
+                    .elementindex:not(.searchit--compactMode) .toolbar .sortmenubtn::after { font-size: 14px; }
+                    .elementindex:not(.searchit--compactMode) .toolbar .spinner { position: absolute; right: 76px; top: 0px; }
+                    body.ltr .elementindex:not(.searchit--compactMode) .sortmenubtn[data-icon]:not(:empty):before { margin-right: 0; }
+                ');
+            }
+
+            $view->registerCss('
+                .elementindex.searchit--compactMode-on .toolbar .statusmenubtn { font-size: 0; }
+                .elementindex.searchit--compactMode-on .toolbar .statusmenubtn::after { font-size: 14px; }
+                .elementindex.searchit--compactMode-on .toolbar .statusmenubtn .status { vertical-align: middle; margin-right: 0; }
+                .elementindex.searchit--compactMode-on .toolbar .sortmenubtn { font-size: 0; }
+                .elementindex.searchit--compactMode-on .toolbar .sortmenubtn::before,
+                .elementindex.searchit--compactMode-on .toolbar .sortmenubtn::after { font-size: 14px; }
+                .elementindex.searchit--compactMode-on .toolbar .spinner { position: absolute; right: 76px; top: 0px; }
+                body.ltr .elementindex.searchit--compactMode-on .sortmenubtn[data-icon]:not(:empty):before { margin-right: 0; }
+            ');
+
+            if($settings->maxFilterWidth)
+            {
+                $view->registerCss('.toolbar .searchit--filters select { max-width: '.$settings->maxFilterWidth.'px; }');
+            }
+        }
+    }
 
     public function getSourceInfo(string $elementType, string $sourceKeyOrHandle)
     {
@@ -97,19 +150,24 @@ class ElementFilters extends Component
             'sources' => $this->getSupportedSources(Asset::class),
         ];
 
-        // Craft::dd(\craft\commerce\Plugin::getInstance());
+        if(Searchit::$plugin->isCommerceEnabled())
+        {
+            $types[Product::class] = [
+                'class' => Product::class,
+                'handle' => 'products',
+                'label' => Craft::t('searchit', 'Products'),
+                'displayName' => Craft::t('searchit', 'Product'),
+                'sources' => $this->getSupportedSources(Product::class),
+            ];
 
-        // $plugin = Craft::$app->getPlugins()->getPlugin('commerce');
-        // if(Searchit::$plugin->isCommerceEnabled())
-        // {
-        //     $types[Product::class] = [
-        //         'class' => Product::class,
-        //         'handle' => 'products',
-        //         'label' => Craft::t('searchit', 'Products'),
-        //         'displayName' => Craft::t('searchit', 'Product'),
-        //         'sources' => $this->getSupportedSources(Product::class),
-        //     ];
-        // }
+            $types[Order::class] = [
+                'class' => Order::class,
+                'handle' => 'orders',
+                'label' => Craft::t('searchit', 'Orders'),
+                'displayName' => Craft::t('searchit', 'Order'),
+                'sources' => $this->getSupportedSources(Order::class),
+            ];
+        }
 
         $this->_supportedElementTypes = $types;
         return $this->_supportedElementTypes;
@@ -144,6 +202,9 @@ class ElementFilters extends Component
                             break;
                         case(User::class):
                             $skip = $source['key'] == '*';
+                            break;
+                        case(Order::class):
+                            $skip = true;
                             break;
                     }
 

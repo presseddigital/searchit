@@ -126,11 +126,16 @@ Create filters for file types, extensions etc.
 { "filter":"extension:gif", "label":"GIF" }
 ```
 
-## Roadmap
-Support for Commerce comming very soon
-
 #### Useful Resources
-Craft CMS Search Documentation [Docs](https://docs.craftcms.com/v3/searching.html)
+
+[Entry Queries](https://docs.craftcms.com/v3/dev/element-queries/entry-queries.html#parameters)<br/>
+[Asset Queries](https://docs.craftcms.com/v3/dev/element-queries/asset-queries.html#parameters)<br/>
+[User Queries](https://docs.craftcms.com/v3/dev/element-queries/user-queries.html#parameters)<br/>
+[Category Queries](https://docs.craftcms.com/v3/dev/element-queries/category-queries.html#parameters)<br/>
+[Product Queries](https://github.com/craftcms/commerce-docs/blob/v2/en/craft-products.md)<br/>
+[Order Queries](https://github.com/craftcms/commerce-docs/blob/v2/en/craft-orders.md)<br/>
+
+Also see the Craft CMS Search Documentation [Docs](https://docs.craftcms.com/v3/searching.html)
 
 As with the regular Craft Search, if you suspect that your search indexes don’t have the latest and greatest data, you can have Craft rebuild them with the Rebuild Search Indexes tool in Settings. [Docs](https://docs.craftcms.com/v3/searching.html#rebuilding-your-search-indexes)
 
