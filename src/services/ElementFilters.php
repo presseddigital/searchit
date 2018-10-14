@@ -19,8 +19,10 @@ use craft\elements\Entry;
 use craft\elements\User;
 use craft\elements\Asset;
 
+use craft\commerce\Plugin as Commerce;
 use craft\commerce\elements\Product;
 use craft\commerce\elements\Order;
+use craft\commerce\elements\Subscription;
 
 class ElementFilters extends Component
 {
@@ -167,6 +169,15 @@ class ElementFilters extends Component
                 'displayName' => Craft::t('searchit', 'Order'),
                 'sources' => $this->getSupportedSources(Order::class),
             ];
+
+            $types[Subscription::class] = [
+                'class' => Subscription::class,
+                'handle' => 'subscriptions',
+                'label' => Craft::t('searchit', 'Subscriptions'),
+                'displayName' => Craft::t('searchit', 'Subscription'),
+                'sources' => $this->getSupportedSources(Subscription::class),
+            ];
+
         }
 
         $this->_supportedElementTypes = $types;
@@ -201,10 +212,13 @@ class ElementFilters extends Component
                             $skip = strpos($source['key'], 'section:') === false;
                             break;
                         case(User::class):
+                        case(Product::class):
+                        case(Subscription::class):
+                        case(Order::class):
                             $skip = $source['key'] == '*';
                             break;
-                        case(Order::class):
-                            $skip = true;
+                        // case(Order::class):
+                        //     $skip = true;
                             break;
                     }
 
@@ -473,7 +487,10 @@ class ElementFilters extends Component
         $filters = [];
         foreach ($elementFilters as $elementFilter)
         {
-            $filters[] = $elementFilter->getOptions();
+            $filters[] = [
+                'type' => $elementFilter->getInputType(),
+                'options' => $elementFilter->getOptions(),
+            ];
         }
         return $filters;
     }

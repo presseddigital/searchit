@@ -11,7 +11,10 @@ use craft\elements\User;
 
 use craft\helpers\StringHelper;
 
+use craft\commerce\Plugin as Commerce;
 use craft\commerce\elements\Product;
+use craft\commerce\elements\Order;
+use craft\commerce\elements\Subscription;
 
 class ElementHelper
 {
@@ -37,14 +40,24 @@ class ElementHelper
                 return Asset::class;
                 break;
 
+            case 'user':
+            case 'users':
+                return User::class;
+                break;
+
             case 'product':
             case 'products':
                 return Searchit::$commerceInstalled ? Product::class : false;
                 break;
 
-            case 'user':
-            case 'users':
-                return User::class;
+            case 'order':
+            case 'orders':
+                return Searchit::$commerceInstalled ? Order::class : false;
+                break;
+
+            case 'subscription':
+            case 'subscriptions':
+                return Searchit::$commerceInstalled ? Subscription::class : false;
                 break;
 
             default:

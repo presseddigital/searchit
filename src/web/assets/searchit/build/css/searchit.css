@@ -1,0 +1,7 @@
+.searchit--filter:not(:last-child) {
+    margin-right: 7px;
+}
+.searchit--filter.datewrapper.texticon {
+    min-width: 110px;
+    width: 7em;
+}

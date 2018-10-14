@@ -85,31 +85,62 @@ var ElementFilters = (function() {
 				container.setAttribute('class', 'searchit--filters');
 				container.setAttribute(settings.attributes.filters, filter.elementType);
 
-				var selects = Array.from(filter.filters);
-				selects.forEach(function (options, optionIndex) {
+				var _filters = Array.from(filter.filters);
+				_filters.forEach(function (_filter, optionIndex) {
 
 					var wrapper = document.createElement('div');
 					wrapper.setAttribute('id', 'element-filter-'+filterIndex+'-'+optionIndex);
-					wrapper.setAttribute('class', 'select');
+					wrapper.setAttribute('class', 'searchit--filter');
+					wrapper.setAttribute('data-filter-'+_filter.type, '');
 					container.appendChild(wrapper);
 
-					var select = document.createElement('select');
-					wrapper.appendChild(select);
+					switch(_filter.type)
+					{
+						case('select'):
+							wrapper.classList.add('select');
 
-					Object.keys(options).forEach(function (key) {
-						var option = document.createElement('option');
-					    option.value = key;
-					    option.text = options[key];
-					    select.appendChild(option);
-					});
+							var select = document.createElement('select');
+							wrapper.appendChild(select);
 
+							console.log(select, wrapper, container);
+
+							Object.keys(_filter.options).forEach(function (key) {
+								var option = document.createElement('option');
+							    option.value = key;
+							    option.text = _filter.options[key];
+							    select.appendChild(option);
+							});
+
+							break;
+
+						case('date'):
+							wrapper.classList.add('datewrapper', 'texticon', 'icon');
+							wrapper.setAttribute('data-icon', 'date');
+
+							var input = document.createElement('input');
+							input.setAttribute('type', 'text');
+							input.setAttribute('class', 'text');
+							input.setAttribute('autocomplete', 'off');
+							wrapper.appendChild(input);
+
+							break;
+					}
 				});
+
+				// // Temp date
+				// var date = document.createElement('span');
+				// date.innerHTML = '<div class="searchit--filter datewrapper texticon icon" data-icon="date" data-filter-date><input data-filter-date-from type="text" name="postDate[from]" class="text" size="20" autocomplete="off" /></div>';
+				// container.appendChild(date.firstChild);
 
 				if(!elementFilters.hasOwnProperty(filter.elementType)) {
 					elementFilters[filter.elementType] = {};
 				}
 				elementFilters[filter.elementType][filter.source] = container;
 			});
+		}
+
+		var handleDateChange = function(event) {
+			console.log('handleDateChange', event);
 		}
 
 		var getElementFilters = function(elementType, source) {
@@ -119,7 +150,6 @@ var ElementFilters = (function() {
 				return false;
 			}
 			return elementFilters[elementType][source];
-
 		}
 
 		var updateElementFilters = function() {
@@ -135,6 +165,14 @@ var ElementFilters = (function() {
 				var filters  = getElementFilters(elementIndex.elementType, elementIndex.sourceKey);
 				if(filters) {
 					dom.search.parentNode.insertBefore(filters, dom.search);
+
+					var $picker = $(filters.querySelector('input'));
+					$picker.datepicker($.extend({
+		                onSelect: function(event) {
+		                	handleDateChange(event);
+		                }
+		            }, Craft.datepickerOptions));
+
 				}
 			}
 		}

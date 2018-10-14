@@ -17,7 +17,3 @@
     padding: 3px 7px 1px;
     width: 19em;
 }
-
-.searchit--filters .select:not(:last-child) {
-    margin-right: 7px;
-}

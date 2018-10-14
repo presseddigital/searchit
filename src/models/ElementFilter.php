@@ -127,14 +127,16 @@ class ElementFilter extends Model
         $view->setTemplateMode($currentTemplateMode);
     }
 
-    public function isManualFilterType()
+    public function getInputType()
     {
-        return $this->filterType == 'manual';
-    }
-
-    public function isDynamicFilterType()
-    {
-        return $this->filterType == 'dynamic';
+        switch ($this->filterType)
+        {
+            case 'manual':
+            case 'dynamic':
+                return 'select';
+            case 'date':
+                return 'date';
+        }
     }
 
     public function getOptions()
@@ -181,10 +183,8 @@ class ElementFilter extends Model
 
     public function getPreview()
     {
-        return Craft::$app->getView()->renderTemplateMacro('_includes/forms', 'select', [
-            [
-                'options' => $this->getOptions(),
-            ]
+        return Craft::$app->getView()->renderTemplate('searchit/_includes/filter/preview', [
+            'elementFilter' => $this
         ]);
     }
 

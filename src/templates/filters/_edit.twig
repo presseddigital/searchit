@@ -36,6 +36,7 @@
         options: {
             dynamic: 'Dynamic'|t('searchit'),
             manual: 'Manual'|t('searchit'),
+            date: 'Date'|t('searchit'),
         },
         value: elementFilter.filterType,
         toggle: true,
@@ -125,6 +126,34 @@
             },
             errors: elementFilter.getErrors('manual') ?? false,
         }) }}
+
+    </div>
+
+    <div id="{{ 'date'|id }}" {% if elementFilter.filterType != 'date' %} class="hidden"{% endif %}>
+
+        <p>DATE FILTER SETTINGS</p>
+
+{#         {{ forms.editableTableField({
+            id: 'manualSettings',
+            name: 'settings[date][type]',
+            label: 'Filter Options'|t('searchit'),
+            instructions: "Specify this filters dropdown options."|t('searchit'),
+            rows: elementFilter.filterType == 'manual' ? (elementFilter.settings ?? []) : [],
+            textual: false,
+            addRowLabel: 'Add filter'|t('searchit'),
+            cols: {
+                label: {
+                    heading: 'Label'|t('searchit'),
+                    type: 'singleline',
+                    width: '30%',
+                },
+                filter: {
+                    heading: 'Filter (JSON Criteria or Search String)'|t('searchit'),
+                    type: 'singleline',
+                }
+            },
+            errors: elementFilter.getErrors('manual') ?? false,
+        }) }} #}
 
     </div>
 

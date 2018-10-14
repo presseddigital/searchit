@@ -16,12 +16,6 @@
         }) }}</p>
     {% endif %}
 
-	{#
-	<div id="no-elementFilters"{% if elementFilters|length %} class="hidden"{% endif %}>
-	    <p>{{ "No filters exist yet."|t('searchit') }}</p>
-	</div>
-	#}
-
 	<div class="elementindex" data-element-filter-preview data-type="{{ elementType }}" data-source="{{ source.key }}">
         {% include "_elements/indexcontainer" with {
             showSiteMenu: false,

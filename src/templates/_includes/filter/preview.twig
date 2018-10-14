@@ -1,0 +1,32 @@
+{% set elementFilter = elementFilter ?? false %}
+{% if elementFilter %}
+	{% import "_includes/forms" as forms %}
+
+		{% switch elementFilter.inputType %}
+
+			{% case "select" %}
+
+				<div class="searchit-filter select">
+					{{ forms.select({
+						options: elementFilter.options
+					})}}
+				</div>
+
+			{% case "date" %}
+
+				{% set id = 'date'~random()~'-date' %}
+				<div class="searchit-filter datewrapper texticon icon" data-icon="date">
+					{{ forms.text({
+						id: id,
+				        autocomplete: false,
+				        placeholder: ' ',
+				    }) }}
+		    	</div>
+
+		    	{%- js %}
+				    $('#{{ id|namespaceInputId|e('js') }}').datepicker(Craft.datepickerOptions);
+				{%- endjs %}
+
+		{% endswitch %}
+
+{% endif %}
