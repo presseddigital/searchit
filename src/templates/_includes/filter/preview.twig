@@ -15,17 +15,34 @@
 			{% case "date" %}
 
 				{% set id = 'date'~random()~'-date' %}
-				<div class="searchit-filter datewrapper texticon icon" data-icon="date">
+
+				<div class="searchit--filter datewrapper texticon icon" data-icon="date">
 					{{ forms.text({
-						id: id,
+						id: id~'From',
 				        autocomplete: false,
 				        placeholder: ' ',
 				    }) }}
 		    	</div>
 
 		    	{%- js %}
-				    $('#{{ id|namespaceInputId|e('js') }}').datepicker(Craft.datepickerOptions);
+			    	$('#{{ (id~'From')|namespaceInputId|e('js') }}').datepicker(Craft.datepickerOptions);
 				{%- endjs %}
+
+				{% if elementFilter.settings.type == 'range' %}
+					<span class="searchit--filter">to</span>
+					<div class="searchit--filter datewrapper texticon icon" data-icon="date">
+						{{ forms.text({
+							id: id~'To',
+					        autocomplete: false,
+					        placeholder: ' ',
+					    }) }}
+			    	</div>
+
+			    	{%- js %}
+				    	$('#{{ (id~'To')|namespaceInputId|e('js') }}').datepicker(Craft.datepickerOptions);
+					{%- endjs %}
+
+				{% endif %}
 
 		{% endswitch %}
 

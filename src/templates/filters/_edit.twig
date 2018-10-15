@@ -68,6 +68,7 @@
         },
         label: user.fullName
     })|json_encode() }}{{ not loop.last ? ',' }}
+
 {% endfor %}
 
 {% for category in craft.categories.group('countries').all() %}
@@ -131,29 +132,31 @@
 
     <div id="{{ 'date'|id }}" {% if elementFilter.filterType != 'date' %} class="hidden"{% endif %}>
 
-        <p>DATE FILTER SETTINGS</p>
-
-{#         {{ forms.editableTableField({
-            id: 'manualSettings',
+        {{ forms.selectField({
+            label: "Type"|t('searchit'),
+            instructions: "Choose the type of date filter."|t('searchit'),
+            id: 'dateSettingsType',
             name: 'settings[date][type]',
-            label: 'Filter Options'|t('searchit'),
-            instructions: "Specify this filters dropdown options."|t('searchit'),
-            rows: elementFilter.filterType == 'manual' ? (elementFilter.settings ?? []) : [],
-            textual: false,
-            addRowLabel: 'Add filter'|t('searchit'),
-            cols: {
-                label: {
-                    heading: 'Label'|t('searchit'),
-                    type: 'singleline',
-                    width: '30%',
-                },
-                filter: {
-                    heading: 'Filter (JSON Criteria or Search String)'|t('searchit'),
-                    type: 'singleline',
-                }
+            options: {
+                range: 'Range'|t('searchit'),
+                before: 'Before'|t('searchit'),
+                after: 'After'|t('searchit'),
             },
-            errors: elementFilter.getErrors('manual') ?? false,
-        }) }} #}
+            value: elementFilter.settings.type ?? 'range',
+            toggle: true,
+            errors: elementFilter.getErrors('date.range') ?? '',
+        }) }}
+
+        {{ forms.textField({
+            label: 'Date Field'|t('searchit'),
+            instructions: 'Provide a valid date field handle.'|t('searchit'),
+            id: 'dateSettingsField',
+            name: 'settings[date][field]',
+            placeholder: 'postDate',
+            value: elementFilter.settings.field ?? '',
+            errors: elementFilter.getErrors('date.field') ?? '',
+            first: true
+        }) }}
 
     </div>
 

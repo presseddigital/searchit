@@ -3,6 +3,7 @@ namespace fruitstudios\searchit\plugin;
 
 use Craft;
 use fruitstudios\searchit\services\Cp;
+use fruitstudios\searchit\services\Fields;
 use fruitstudios\searchit\services\ElementFilters;
 
 trait Services
@@ -20,6 +21,11 @@ trait Services
         return $this->get('elementFilters');
     }
 
+    public function getFields(): Fields
+    {
+        return $this->get('fields');
+    }
+
     // Private Methods
     // =========================================================================
 
@@ -27,6 +33,7 @@ trait Services
     {
         $this->setComponents([
             'cp' => Cp::class,
+            'fields' => Fields::class,
             'elementFilters' => ElementFilters::class,
         ]);
     }

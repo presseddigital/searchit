@@ -445,6 +445,7 @@ class ElementFilters extends Component
     {
         switch ($config['filterType'] ?? false)
         {
+            case 'date':
             case 'manual':
                 $config['settings'] = is_string($config['settings']) ? Json::decodeIfJson($config['settings'], true) : ($config['settings'] ?? []);
                 break;

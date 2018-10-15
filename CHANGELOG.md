@@ -6,8 +6,9 @@ Configure powerful custom filters for an enhanced search experience in the Craft
 
 ### Added
 
-*   Updated Docs
-*   Support for Craft Commerce
+*   Support for Craft Commerce Products, Subscripions & Orders
+*   The new date filter
+*   Improved Docs
 
 ## 1.0.3 - 2018-10-12
 

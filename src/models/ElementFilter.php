@@ -8,6 +8,7 @@ use craft\base\Model;
 use craft\helpers\Json;
 use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
+use craft\fields\Date as DateField;
 use craft\db\Query;
 
 class ElementFilter extends Model
@@ -117,6 +118,40 @@ class ElementFilter extends Model
                         ];
 
                     }
+                }
+                break;
+
+            case 'date':
+                if ($this->settings['field'] == '')
+                {
+                    $this->addError('date.field', Craft::t('searchit', 'Date field is requried'));
+                }
+                else
+                {
+                    switch($this->settings['field'])
+                    {
+                        case 'dateCreated': // All
+                        case 'dateUpdated': // All
+                        case 'expiryDate': // Entry & Product
+                        case 'postDate': // Entry & Product
+                        case 'dateModified': // Asset
+                        case 'lastLoginDate': // User
+                        case 'dateOrdered': // Order
+                        case 'datePaid': // Order
+                        case 'dateCancelled': // Subscription
+                        case 'dateExpired': // Subscription
+                        case 'nextPaymentDate': // Subscription
+                            // Valid
+                            break;
+
+                        default:
+                            $field = Searchit::$plugin->getFields()->getFieldByHandle($this->settings['field']);
+                            if(!$field || !($field instanceof DateField))
+                            {
+                                $this->addError('date.field', Craft::t('searchit', 'Please provide a valid date field handle'));
+                            }
+                            break;
+                       }
                 }
                 break;
         }
