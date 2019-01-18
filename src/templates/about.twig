@@ -26,14 +26,11 @@
 
     <div class="flex">
         <div class="pane fruit-licencekey">
-            <input class="text code{% if config.hasIssues %} error{% endif %}" size="29" maxlength="29" value="{{ config.licenseKey|replace('/.{4}/', '$0-')|trim('-') }}" placeholder="XXXX-XXXX-XXXX-XXXX-XXXX-XXXX" readonly>
+            <input class="text code{% if config.licenseIssues %} error{% endif %}" size="29" maxlength="29" value="{{ config.licenseKey|replace('/.{4}/', '$0-')|trim('-') }}" placeholder="XXXX-XXXX-XXXX-XXXX-XXXX-XXXX" readonly>
         </div>
-        <a class="btn{% if config.hasIssues %} submit{% endif %}{% if not (showLicenseKey and not config.licenseKey) %} hidden{% endif %}" href="{{ url('plugin-store/buy/searchit')}}">{{ "Buy now"|t('app') }}</a>
+        <a class="btn{% if config.licenseIssues %} submit{% endif %}{% if not (showLicenseKey and not config.licenseKey) %} hidden{% endif %}" href="{{ url('plugin-store/buy/searchit')}}">{{ "Buy now"|t('app') }}</a>
         <div class="spinner hidden"></div>
     </div>
 
-    {% if showLicenseKey and config.licenseStatusMessage %}
-        <p class="error">{{ config.licenseStatusMessage|raw }}</p>
-    {% endif %}
 
 {% endblock %}
