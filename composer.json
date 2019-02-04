@@ -2,7 +2,7 @@
     "name": "fruitstudios/searchit",
     "description": "Configure powerful custom filters for an enhanced search experience in the Craft CMS control panel.",
     "type": "craft-plugin",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "keywords": [
         "craft",
         "cms",
@@ -27,7 +27,7 @@
         }
     ],
     "require": {
-        "craftcms/cms": "^3.0.2"
+        "craftcms/cms": "^3.1.2"
     },
     "autoload": {
         "psr-4": {

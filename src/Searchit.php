@@ -54,7 +54,7 @@ class Searchit extends Plugin
     // Public Properties
     // =========================================================================
 
-    public $schemaVersion = '1.0.0';
+    public $schemaVersion = '1.0.4';
 
     // Traits
     // =========================================================================
@@ -172,9 +172,6 @@ class Searchit extends Plugin
                 .elementindex.searchit--compactMode-on .toolbar .spinner { position: absolute; right: 76px; top: 0px; }
                 body.ltr .elementindex.searchit--compactMode-on .sortmenubtn[data-icon]:not(:empty):before { margin-right: 0; }
             ');
-
-
-
 
             if(self::$settings->maxFilterWidth)
             {

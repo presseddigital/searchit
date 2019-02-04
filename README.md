@@ -9,6 +9,25 @@ See it in action...
 
 <p align="left"><a href="https://www.youtube.com/watch?v=CYzaND0IGPw" target="_blank"><img width="600" src="resources/img/searchit-promo.png" alt="Searchit Promo Video"></a></p>
 
+## Requirements
+
+This plugin requires Craft CMS 3.1.2 or later.
+
+## Installation
+
+### Plugin Store
+
+Log into your control panel, hit up the 'Plugin Store', search for this plugin and install.
+
+### Composer
+
+Open terminal, go to your Craft project folder and use composer to load this plugin. Once loaded you can install via the Craft Control Panel, go to Settings → Plugins, locate the plugin and hit “Install”.
+
+```bash
+cd /path/to/project
+composer require fruitstudios/searchit
+```
+
 ## Creating a filter
 
 Filters can be produced manually or dynamically and are made up of a JSON array containing rows with a label key `(string)` and a filter key `(string or valid JSON)`. If the filter contains a `string` then it will pass that value to the `search` parameter on the element search. If you pass JSON to the filter than you can create multiple query parameters.
@@ -127,7 +146,7 @@ Create filters for file types, extensions etc.
 ```
 
 ## Roadmap
-Support for Commerce comming very soon
+Support for Commerce coming very soon
 
 #### Useful Resources
 Craft CMS Search Documentation [Docs](https://docs.craftcms.com/v3/searching.html)

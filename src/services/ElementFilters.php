@@ -291,7 +291,8 @@ class ElementFilters extends Component
 
     public function saveElementFilter(ElementFilter $model, bool $runValidation = true): bool
     {
-        if ($model->id)
+        $isNew = !$model->id;
+        if (!$isNew)
         {
             $record = ElementFilterRecord::findOne($model->id);
             if (!$record)
@@ -316,7 +317,9 @@ class ElementFilters extends Component
         $record->filterType = $model->filterType;
         $record->settings = $model->settings;
 
-        $maxSortOrder = (new Query())
+        if($isNew)
+        {
+            $maxSortOrder = (new Query())
             ->from(['{{%searchit_elementfilters}}'])
             ->where([
                 'type' => $model->type,
@@ -324,7 +327,8 @@ class ElementFilters extends Component
             ])
             ->max('[[sortOrder]]');
 
-        $record->sortOrder = $maxSortOrder ? $maxSortOrder + 1 : 1;
+            $record->sortOrder = $maxSortOrder ? $maxSortOrder + 1 : 1;
+        }
 
         // Save it!
         $record->save(false);

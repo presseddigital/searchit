@@ -11,7 +11,7 @@ use craft\elements\User;
 
 use craft\helpers\StringHelper;
 
-use craft\commerce\lements\Product;
+use craft\commerce\elements\Product;
 
 class ElementHelper
 {

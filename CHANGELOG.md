@@ -1,6 +1,18 @@
 # Searchit Changelog
 > Configure powerful custom filters for an enhanced search experience in the Craft CMS control panel for [Craft 3](http://craftcms.com)
 
+## 1.0.4 - 2019-02-04
+
+### Fixed
+
+*   Fixed - Updates to Craft 3.1, update all sources to use UID rather than ID
+*   Fixed - Reorder bug when resaving existing element filters
+*   Fixed - Readme spelling mistake (thanks to @tdaubs)
+
+### Added
+
+*   Added - Improved installation instructions
+
 ## 1.0.3 - 2019-01-18
 
 ### Fixed
