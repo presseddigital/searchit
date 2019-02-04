@@ -127,7 +127,7 @@ Create filters for file types, extensions etc.
 ```
 
 ## Roadmap
-Support for Commerce comming very soon
+Support for Commerce coming very soon
 
 #### Useful Resources
 Craft CMS Search Documentation [Docs](https://docs.craftcms.com/v3/searching.html)
