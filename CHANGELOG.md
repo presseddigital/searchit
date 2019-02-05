@@ -1,6 +1,12 @@
 # Searchit Changelog
 > Configure powerful custom filters for an enhanced search experience in the Craft CMS control panel for [Craft 3](http://craftcms.com)
 
+## 1.0.5 - 2019-02-05
+
+### Fixed
+
+*   Fixed - UID Migration error
+
 ## 1.0.4 - 2019-02-04
 
 ### Fixed

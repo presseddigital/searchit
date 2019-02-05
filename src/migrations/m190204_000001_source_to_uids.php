@@ -35,24 +35,26 @@ class m190204_000001_source_to_uids extends Migration
                     // Do we need to update the source key?
                     $uid = false;
                     $sourceKeyParts = explode(':', $elementFilter->source);
-                    if($sourceKeyParts[1] ?? false)
+                    $sourceId = $sourceKeyParts[1] ?? false;
+
+                    if($sourceId && ctype_digit($sourceId))
                     {
                         switch ($elementFilter->type)
                         {
                             case Category::class:
-                                $uid = Craft::$app->getCategories()->getGroupById($sourceKeyParts[1])->uid ?? false;
+                                $uid = Craft::$app->getCategories()->getGroupById($sourceId)->uid ?? false;
                             break;
 
                             case Entry::class:
-                                $uid = Craft::$app->getSections()->getSectionById($sourceKeyParts[1])->uid ?? false;
+                                $uid = Craft::$app->getSections()->getSectionById($sourceId)->uid ?? false;
                             break;
 
                             case User::class:
-                                $uid = Craft::$app->getUserGroups()->getGroupById($sourceKeyParts[1])->uid ?? false;
+                                $uid = Craft::$app->getUserGroups()->getGroupById($sourceId)->uid ?? false;
                             break;
 
                             case Asset::class:
-                                $uid = Craft::$app->getAssets()->getFolderById($sourceKeyParts[1])->uid ?? false;
+                                $uid = Craft::$app->getAssets()->getFolderById($sourceId)->uid ?? false;
                             break;
                         }
 
