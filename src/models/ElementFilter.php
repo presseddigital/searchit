@@ -67,7 +67,6 @@ class ElementFilter extends Model
                 {
                     foreach ($this->settings as $i => $row)
                     {
-
                         $labelError = false;
                         $label = $row['label'] ?? '';
                         if($label == '')
@@ -91,6 +90,12 @@ class ElementFilter extends Model
                         }
                         else
                         {
+                            // Account for hasErrors being incorrectly stored in the database
+                            if(isset($filter['value']))
+                            {
+                                $filter = $filter['value'];
+                            }
+
                             if(StringHelper::containsAny($filter, ['{', '"', '}']))
                             {
                                 $decoded = Json::decodeIfJson($filter, true);
@@ -105,17 +110,20 @@ class ElementFilter extends Model
                             }
                         }
 
-                        $this->settings[$i] = [
-                            'label' => [
-                                'value' => $label ?? '',
-                                'hasErrors' => $labelError ?? '',
-                            ],
-                            'filter' => [
-                                'value' => $filter ?? '',
-                                'hasErrors' => $filterError ?? '',
-                            ]
-                        ];
-
+                        // Add Any Errors
+                        if ($filterError || $labelError)
+                        {
+                             $this->settings[$i] = [
+                                'label' => [
+                                    'value' => $label ?? '',
+                                    'hasErrors' => $labelError ?? '',
+                                ],
+                                'filter' => [
+                                    'value' => $filter ?? '',
+                                    'hasErrors' => $filterError ?? '',
+                                ]
+                            ];
+                        }
                     }
                 }
                 break;
@@ -148,11 +156,13 @@ class ElementFilter extends Model
         {
             case 'manual':
                 $filters = $this->settings;
-
-                foreach ($filters as $k => $v)
+                if($filters)
                 {
-                    $filters[$k]['label'] = $v['label']['value'] ?? $v['label'];
-                    $filters[$k]['filter'] = Json::decodeIfJson(($v['filter']['value'] ?? $v['filter']), true);
+                    foreach ($filters as $k => $v)
+                    {
+                        $filters[$k]['label'] = $v['label']['value'] ?? $v['label'];
+                        $filters[$k]['filter'] = Json::decodeIfJson(($v['filter']['value'] ?? $v['filter']), true);
+                    }
                 }
                 break;
 

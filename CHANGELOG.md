@@ -1,6 +1,12 @@
 # Searchit Changelog
 > Configure powerful custom filters for an enhanced search experience in the Craft CMS control panel for [Craft 3](http://craftcms.com)
 
+## 1.0.6 - 2019-02-12
+
+### Fixed
+
+*   Fixed - Validation error with manual element filters
+
 ## 1.0.5 - 2019-02-05
 
 ### Fixed
