@@ -25,6 +25,7 @@ use craft\helpers\UrlHelper;
 use craft\helpers\Json;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\PluginEvent;
+use craft\events\TemplateEvent;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\View;
 
@@ -48,7 +49,6 @@ class Searchit extends Plugin
     public static $plugin;
     public static $settings;
     public static $devMode;
-    public static $view;
     public static $commerceInstalled;
 
     // Public Properties
@@ -75,7 +75,6 @@ class Searchit extends Plugin
         self::$plugin = $this;
         self::$settings = Searchit::$plugin->getSettings();
         self::$devMode = Craft::$app->getConfig()->getGeneral()->devMode;
-        self::$view = Craft::$app->getView();
         self::$commerceInstalled = class_exists(CommercePlugin::class);
 
         $this->name = Searchit::$settings->pluginNameOverride;
@@ -132,52 +131,60 @@ class Searchit extends Plugin
 
     public function initElementFilters()
     {
-        $request = Craft::$app->getRequest();
-        if($request->isCpRequest)
-        {
-            $general = Craft::$app->getConfig()->getGeneral();
-            $js = [
-                'id' => StringHelper::UUID(),
-                'filters' => Searchit::$plugin->getElementFilters()->getActiveElementFiltersArray(),
-                'compactMode' => (bool) self::$settings->compactMode,
-                'debug' => $general->devMode,
-                'csrfTokenName' => $general->csrfTokenName,
-                'csrfTokenValue' => $request->getCsrfToken(),
-            ];
-
-            $view = Craft::$app->getView();
-            $view->registerAssetBundle(SearchitAssetBundle::class);
-            $view->registerJs('new ElementFilters('.Json::encode($js).');');
-
-            if(self::$settings->compactMode)
-            {
-                $view->registerCss('
-                    .elementindex:not(.searchit--compactMode) .toolbar .statusmenubtn { font-size: 0; }
-                    .elementindex:not(.searchit--compactMode) .toolbar .statusmenubtn::after { font-size: 14px; }
-                    .elementindex:not(.searchit--compactMode) .toolbar .statusmenubtn .status { vertical-align: middle; margin-right: 0; }
-                    .elementindex:not(.searchit--compactMode) .toolbar .sortmenubtn { font-size: 0; }
-                    .elementindex:not(.searchit--compactMode) .toolbar .sortmenubtn::before,
-                    .elementindex:not(.searchit--compactMode) .toolbar .sortmenubtn::after { font-size: 14px; }
-                    .elementindex:not(.searchit--compactMode) .toolbar .spinner { position: absolute; right: 76px; top: 0px; }
-                    body.ltr .elementindex:not(.searchit--compactMode) .sortmenubtn[data-icon]:not(:empty):before { margin-right: 0; }
-                ');
-            }
-            $view->registerCss('
-                .elementindex.searchit--compactMode-on .toolbar .statusmenubtn { font-size: 0; }
-                .elementindex.searchit--compactMode-on .toolbar .statusmenubtn::after { font-size: 14px; }
-                .elementindex.searchit--compactMode-on .toolbar .statusmenubtn .status { vertical-align: middle; margin-right: 0; }
-                .elementindex.searchit--compactMode-on .toolbar .sortmenubtn { font-size: 0; }
-                .elementindex.searchit--compactMode-on .toolbar .sortmenubtn::before,
-                .elementindex.searchit--compactMode-on .toolbar .sortmenubtn::after { font-size: 14px; }
-                .elementindex.searchit--compactMode-on .toolbar .spinner { position: absolute; right: 76px; top: 0px; }
-                body.ltr .elementindex.searchit--compactMode-on .sortmenubtn[data-icon]:not(:empty):before { margin-right: 0; }
-            ');
-
-            if(self::$settings->maxFilterWidth)
-            {
-                $view->registerCss('.toolbar .searchit--filters select { max-width: '.self::$settings->maxFilterWidth.'px; }');
-            }
+        // If not control panel request, bail
+        if (!Craft::$app->getRequest()->getIsCpRequest()) {
+            return false;
         }
+
+        // Load CSS & JS before template is rendered
+        Event::on(
+            View::class,
+            View::EVENT_BEFORE_RENDER_TEMPLATE,
+            function (TemplateEvent $event) {
+                $request = Craft::$app->getRequest();
+                $general = Craft::$app->getConfig()->getGeneral();
+                $js = [
+                    'id' => StringHelper::UUID(),
+                    'filters' => Searchit::$plugin->getElementFilters()->getActiveElementFiltersArray(),
+                    'compactMode' => (bool) self::$settings->compactMode,
+                    'debug' => $general->devMode,
+                    'csrfTokenName' => $general->csrfTokenName,
+                    'csrfTokenValue' => $request->getCsrfToken(),
+                ];
+
+                $view = Craft::$app->getView();
+                $view->registerAssetBundle(SearchitAssetBundle::class);
+                $view->registerJs('new ElementFilters('.Json::encode($js).');');
+
+                if(self::$settings->compactMode)
+                {
+                    $view->registerCss('
+                        .elementindex:not(.searchit--compactMode) .toolbar .statusmenubtn { font-size: 0; }
+                        .elementindex:not(.searchit--compactMode) .toolbar .statusmenubtn::after { font-size: 14px; }
+                        .elementindex:not(.searchit--compactMode) .toolbar .statusmenubtn .status { vertical-align: middle; margin-right: 0; }
+                        .elementindex:not(.searchit--compactMode) .toolbar .sortmenubtn { font-size: 0; }
+                        .elementindex:not(.searchit--compactMode) .toolbar .sortmenubtn::before,
+                        .elementindex:not(.searchit--compactMode) .toolbar .sortmenubtn::after { font-size: 14px; }
+                        .elementindex:not(.searchit--compactMode) .toolbar .spinner { position: absolute; right: 76px; top: 0px; }
+                        body.ltr .elementindex:not(.searchit--compactMode) .sortmenubtn[data-icon]:not(:empty):before { margin-right: 0; }
+                    ');
+                }
+                $view->registerCss('
+                    .elementindex.searchit--compactMode-on .toolbar .statusmenubtn { font-size: 0; }
+                    .elementindex.searchit--compactMode-on .toolbar .statusmenubtn::after { font-size: 14px; }
+                    .elementindex.searchit--compactMode-on .toolbar .statusmenubtn .status { vertical-align: middle; margin-right: 0; }
+                    .elementindex.searchit--compactMode-on .toolbar .sortmenubtn { font-size: 0; }
+                    .elementindex.searchit--compactMode-on .toolbar .sortmenubtn::before,
+                    .elementindex.searchit--compactMode-on .toolbar .sortmenubtn::after { font-size: 14px; }
+                    .elementindex.searchit--compactMode-on .toolbar .spinner { position: absolute; right: 76px; top: 0px; }
+                    body.ltr .elementindex.searchit--compactMode-on .sortmenubtn[data-icon]:not(:empty):before { margin-right: 0; }
+                ');
+
+                if(self::$settings->maxFilterWidth)
+                {
+                    $view->registerCss('.toolbar .searchit--filters select { max-width: '.self::$settings->maxFilterWidth.'px; }');
+                }
+        });
     }
 
     // Protected Methods
