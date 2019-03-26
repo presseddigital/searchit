@@ -1,6 +1,12 @@
 # Searchit Changelog
 > Configure powerful custom filters for an enhanced search experience in the Craft CMS control panel for [Craft 3](http://craftcms.com)
 
+## 1.0.7 - 2019-03-26
+
+### Fixed
+
+*   Fixed - Plugin conflict: LogicException thrown by another plugin during init(). Thanks @johndwells
+
 ## 1.0.6 - 2019-02-12
 
 ### Fixed

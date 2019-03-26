@@ -25,6 +25,7 @@ use craft\helpers\UrlHelper;
 use craft\helpers\Json;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\PluginEvent;
+use craft\events\TemplateEvent;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\View;
 
@@ -132,9 +133,14 @@ class Searchit extends Plugin
 
     public function initElementFilters()
     {
-        $request = Craft::$app->getRequest();
-        if($request->isCpRequest)
+        if (!Craft::$app->getRequest()->getIsCpRequest())
         {
+            return false;
+        }
+
+        Event::on(View::class, View::EVENT_BEFORE_RENDER_TEMPLATE, function (TemplateEvent $event) {
+
+            $request = Craft::$app->getRequest();
             $general = Craft::$app->getConfig()->getGeneral();
             $js = [
                 'id' => StringHelper::UUID(),
@@ -162,6 +168,7 @@ class Searchit extends Plugin
                     body.ltr .elementindex:not(.searchit--compactMode) .sortmenubtn[data-icon]:not(:empty):before { margin-right: 0; }
                 ');
             }
+
             $view->registerCss('
                 .elementindex.searchit--compactMode-on .toolbar .statusmenubtn { font-size: 0; }
                 .elementindex.searchit--compactMode-on .toolbar .statusmenubtn::after { font-size: 14px; }
@@ -177,7 +184,8 @@ class Searchit extends Plugin
             {
                 $view->registerCss('.toolbar .searchit--filters select { max-width: '.self::$settings->maxFilterWidth.'px; }');
             }
-        }
+
+        });
     }
 
     // Protected Methods
