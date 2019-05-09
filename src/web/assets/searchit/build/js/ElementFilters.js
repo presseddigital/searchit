@@ -2,7 +2,6 @@ var ElementFilters = (function() {
 	"use strict";
 
 	var defaults = {
-		filters: {},
 		debug: false,
 		attributes: {
 			id: 'data-element-filters-id',
@@ -24,6 +23,7 @@ var ElementFilters = (function() {
 		var elementIndex;
 		var elementIndexType;
 		var elementFilters = {};
+		var elementFilterCount = 0;
 
 		var dom = {
 			preview: null,
@@ -42,9 +42,6 @@ var ElementFilters = (function() {
 			// DOM Elements
 			dom.toolbar = elementIndex.$toolbar[0];
 			dom.search = elementIndex.$search[0].closest('.search');
-
-			// Filters
-			prepFilters();
 
 			// Listeners
 			dom.toolbar.addEventListener('change', filterHandler, false);
@@ -70,17 +67,15 @@ var ElementFilters = (function() {
 			dom.preview = elementIndexPreview;
 			dom.search = dom.preview.querySelector('.search');
 
-			// Filters
-			prepFilters()
-
 			// Update
 			updateElementFilterPreview();
 		};
 
-		var prepFilters = function() {
-			var filters = Array.from(settings.filters);
-			filters.forEach(function (filter, filterIndex) {
 
+		var prepFilters = function(filter) {
+
+			if(filter && (!elementFilters.hasOwnProperty(filter.elementType) || !elementFilters[filter.elementType].hasOwnProperty(filter.source)))
+			{
 				var container = document.createElement('div');
 				container.setAttribute('class', 'searchit--filters');
 				container.setAttribute(settings.attributes.filters, filter.elementType);
@@ -89,7 +84,8 @@ var ElementFilters = (function() {
 				selects.forEach(function (options, optionIndex) {
 
 					var wrapper = document.createElement('div');
-					wrapper.setAttribute('id', 'element-filter-'+filterIndex+'-'+optionIndex);
+					elementFilterCount = elementFilterCount + 1;
+					wrapper.setAttribute('id', 'element-filter-'+elementFilterCount+'-'+optionIndex);
 					wrapper.setAttribute('class', 'select');
 					container.appendChild(wrapper);
 
@@ -105,21 +101,63 @@ var ElementFilters = (function() {
 
 				});
 
-				if(!elementFilters.hasOwnProperty(filter.elementType)) {
-					elementFilters[filter.elementType] = {};
-				}
-				elementFilters[filter.elementType][filter.source] = container;
-			});
+				storeFilters(filter.elementType, filter.source, container);
+			}
 		}
+
+		var storeFilters = function(elementType, source, value) {
+			if(!elementFilters.hasOwnProperty(elementType)) {
+				elementFilters[elementType] = {};
+			}
+			elementFilters[elementType][source] = value;
+		};
 
 		var getElementFilters = function(elementType, source) {
 
-			if(!elementFilters.hasOwnProperty(elementType) || !elementFilters[elementType].hasOwnProperty(source))
+			if(elementFilters.hasOwnProperty(elementType) && elementFilters[elementType].hasOwnProperty(source))
 			{
-				return false;
+				return elementFilters[elementType][source];
 			}
-			return elementFilters[elementType][source];
 
+			var xhr = new XMLHttpRequest();
+			xhr.open("POST", "/", true);
+			xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+			xhr.setRequestHeader("Accept", "application/json");
+
+			xhr.onreadystatechange = function() {
+
+				if (xhr.readyState !== 4) return;
+				if (xhr.status === 200) {
+
+					var response = parseIfJson(xhr.response);
+					var filters = response.filters || false;
+					if(filters) {
+						prepFilters(filters);
+						updateElementFilters();
+						updateElementFilterPreview();
+					} else {
+						storeFilters(elementType, source, false);
+					}
+				}
+			};
+
+			var formData = new FormData();
+			formData.append("action", "searchit/element-filters/get");
+			formData.append("type", elementType);
+			formData.append("source", source);
+			formData.append(settings.csrfTokenName, settings.csrfTokenValue);
+
+			xhr.responseType = "json";
+			xhr.send(formData);
+		}
+
+		var parseIfJson = function parseIfJson(value) {
+		    try {
+		        var parsed = JSON.parse(value);
+		        return parsed;
+		    } catch (e) {
+		        return value;
+		    }
 		}
 
 		var updateElementFilters = function() {
@@ -138,6 +176,7 @@ var ElementFilters = (function() {
 				}
 			}
 		}
+
 		var updateElementFilterPreview = function() {
 
 			if(dom.preview) {
@@ -160,7 +199,9 @@ var ElementFilters = (function() {
 					select.value = '';
 				});
 				resetCriteria();
-				console.log('[ElementFilters][resetFilters]', elementIndex.settings.criteria);
+				if(settings.debug) {
+					console.log('[ElementFilters][resetFilters]', elementIndex.settings.criteria);
+				}
 			}
 		}
 
@@ -257,10 +298,6 @@ var ElementFilters = (function() {
 
 			if (settings.debug) {
 				console.log('[ElementFilters][settings]', settings);
-			}
-
-			if(!settings.filters.length) {
-				return;
 			}
 
 			// Preview

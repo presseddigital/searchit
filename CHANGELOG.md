@@ -1,6 +1,12 @@
 # Searchit Changelog
 > Configure powerful custom filters for an enhanced search experience in the Craft CMS control panel for [Craft 3](http://craftcms.com)
 
+## 1.0.8 - 2019-05-09
+
+### Fixed
+
+*   Fixed - Performance improvements, filters are only requested when required by an elementIndex.
+
 ## 1.0.7 - 2019-03-26
 
 ### Fixed

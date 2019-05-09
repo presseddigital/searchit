@@ -144,7 +144,6 @@ class Searchit extends Plugin
             $general = Craft::$app->getConfig()->getGeneral();
             $js = [
                 'id' => StringHelper::UUID(),
-                'filters' => Searchit::$plugin->getElementFilters()->getActiveElementFiltersArray(),
                 'compactMode' => (bool) self::$settings->compactMode,
                 'debug' => $general->devMode,
                 'csrfTokenName' => $general->csrfTokenName,

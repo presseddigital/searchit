@@ -36,9 +36,13 @@ class ElementFilters extends Component
     private $_supportedSources = [];
 
     private $_fetchedAllElementFilters;
+
     private $_elementFilters = [];
     private $_elementFiltersByType = [];
     private $_elementFiltersBySource = [];
+
+    private $_elementFiltersForUse = [];
+
 
     // Public Methods
     // =========================================================================
@@ -47,7 +51,7 @@ class ElementFilters extends Component
     {
         $supportedSources = $this->getSupportedSources($elementType);
         $handle = ElementHelper::sourceKeyAsHandle($sourceKeyOrHandle);
-        return $supportedSources[$sourceKeyOrHandle] ?? false;
+        return $supportedSources[$handle] ?? false;
     }
 
     public function getElementInfo(string $elementType)
@@ -147,10 +151,7 @@ class ElementFilters extends Component
                             break;
                     }
 
-                    if($skip)
-                    {
-                        continue;
-                    }
+                    if($skip) continue;
 
                     $sources[$handle] = [
                         'label' => $source['label'],
@@ -192,8 +193,7 @@ class ElementFilters extends Component
             return $this->_elementFilters;
         }
 
-        $results = $this->_createElementFilterQuery()
-            ->all();
+        $results = $this->_createElementFilterQuery()->all();
 
         if($results)
         {
@@ -211,65 +211,89 @@ class ElementFilters extends Component
         return $this->_elementFilters;
     }
 
-    public function getActiveElementFiltersArray(string $type = null)
+    public function getElementFiltersForUse(string $elementType, string $sourceKeyOrHandle)
     {
-        $filters = [];
-        try{
-            $this->getAllElementFilters();
-
-            $supportedElementTypes = $this->getSupportedElementTypes();
-            if($supportedElementTypes)
+        $filters = false;
+        try
+        {
+            // Get supported elementType and source
+            $supportedElementType = $this->getElementInfo($elementType);
+            $supportedSource = $this->getSourceInfo($elementType, $sourceKeyOrHandle);
+            if(!$supportedElementType || !$supportedSource)
             {
-                foreach ($supportedElementTypes as $supportedElementType)
+                return false;
+            }
+
+            // Have we already got any element filters for this elementType and source
+            if($this->_elementFiltersForUse[$supportedElementType['class']][$supportedSource['key']] ?? null !== null)
+            {
+                return $this->_elementFiltersForUse[$supportedElementType['class']][$supportedSource['key']];
+            }
+
+            // Get source settings
+            $sourceSettings = $this->getSourceSettings($supportedElementType['handle'], $supportedSource['handle']);
+
+            // Do we need global filters for this elementType and source
+            $globalElementFilters = false;
+            if(!$sourceSettings->hideGlobalFilters)
+            {
+                $globalElementFilters = $this->_elementFiltersBySource[$supportedElementType['class']][self::GLOBAL_SOURCE_KEY] ?? null;
+                if($globalElementFilters === null)
                 {
-                    // Global Filters
-                    $globalElementFilters = $this->_elementFiltersBySource[$supportedElementType['class']][self::GLOBAL_SOURCE_KEY] ?? false;
-                    $globalFilters = $globalElementFilters ? $this->_elementFiltersAsArrayOfFilters($globalElementFilters) : [];
+                    $globalElementFilters = $this->_createElementFilterQuery()
+                        ->where([
+                            'type' => $supportedElementType['class'],
+                            'source' => self::GLOBAL_SOURCE_KEY,
+                        ])
+                        ->all();
 
-                    // Sources
-                    $supportedSources = $supportedElementType['sources'] ?? [];
-                    foreach ($supportedSources as $supportedSource)
-                    {
-                        $_sourceSettings = $this->getSourceSettings($supportedElementType['handle'], $supportedSource['handle']);
-                        $_filters = [];
-                        switch ($supportedSource['key'])
-                        {
-                            case self::GLOBAL_SOURCE_KEY:
-                                if($globalFilters)
-                                {
-                                    $_filters = $globalFilters;
-                                }
-                                break;
-                            default:
-                                $elementFilters = $this->_elementFiltersBySource[$supportedElementType['class']][$supportedSource['key']] ?? [];
-                                if (!$_sourceSettings->hideGlobalFilters)
-                                {
-                                    $_filters = $globalFilters;
-                                }
-                                $_filters = array_merge($_filters, $this->_elementFiltersAsArrayOfFilters($elementFilters));
-                                break;
-                        }
-
-                        if(!empty($_filters))
-                        {
-                            $filters[] = [
-                                'elementType' => $supportedElementType['class'],
-                                'source' => $supportedSource['key'],
-                                'filters' => $_filters
-                            ];
-                        }
-                    }
+                    $globalElementFilters = $globalElementFilters ? array_map([$this, 'createElementFilter'], $globalElementFilters) : false;
+                    $this->_elementFiltersBySource[$supportedElementType['class']][self::GLOBAL_SOURCE_KEY] = $globalElementFilters;
                 }
             }
-        } catch(\Exception $e) {
-            Craft::error('An error occurred when generating searchit filters: ' . $e->getMessage(), __METHOD__);
+
+            // Get any element filters for this elementType and source
+            $elementFilters = false;
+            if($supportedSource['key'] != self::GLOBAL_SOURCE_KEY)
+            {
+                $elementFilters = $this->_createElementFilterQuery()
+                    ->where([
+                        'type' => $supportedElementType['class'],
+                        'source' => $supportedSource['key'],
+                    ])
+                    ->all();
+                $elementFilters = $elementFilters ? array_map([$this, 'createElementFilter'], $elementFilters) : false;
+                $this->_elementFiltersBySource[$supportedElementType['class']][$supportedSource['key']] = $elementFilters;
+            }
+
+            // Prepare filters for use
+            $filters = false;
+            if ($globalElementFilters || $elementFilters)
+            {
+                $filters = is_array($globalElementFilters) ? $globalElementFilters : [];
+                if(is_array($elementFilters))
+                {
+                    $filters = array_merge($filters, $elementFilters);
+                }
+
+                $filters = [
+                    'elementType' => $supportedElementType['class'],
+                    'source' => $supportedSource['key'],
+                    'filters' => $this->_elementFiltersAsArrayOfFilters($filters),
+                ];
+            }
+
+            $this->_elementFiltersForUse[$supportedElementType['class']][$supportedSource['key']] = $filters;
             return $filters;
+
         }
-
-
-
-        return $filters;
+        catch(\Exception $e)
+        {
+            Craft::error('An error occurred when generating searchit filters: ' . $e->getMessage(), __METHOD__);
+            return false;
+        }
     }
+
 
     public function getElementFilterById($id)
     {
@@ -320,12 +344,12 @@ class ElementFilters extends Component
         if($isNew)
         {
             $maxSortOrder = (new Query())
-            ->from(['{{%searchit_elementfilters}}'])
-            ->where([
-                'type' => $model->type,
-                'source' => $model->source,
-            ])
-            ->max('[[sortOrder]]');
+                ->from(['{{%searchit_elementfilters}}'])
+                ->where([
+                    'type' => $model->type,
+                    'source' => $model->source,
+                ])
+                ->max('[[sortOrder]]');
 
             $record->sortOrder = $maxSortOrder ? $maxSortOrder + 1 : 1;
         }
@@ -411,6 +435,7 @@ class ElementFilters extends Component
 
     // Private Methods
     // =========================================================================
+
     private function _elementFiltersAsArrayOfFilters(array $elementFilters = [])
     {
         $filters = [];
@@ -420,6 +445,7 @@ class ElementFilters extends Component
         }
         return $filters;
     }
+
     private function _createElementFilterQuery(): Query
     {
         return (new Query())

@@ -35,6 +35,24 @@ class ElementFiltersController extends Controller
         ));
     }
 
+    public function actionGet()
+    {
+        $this->requireAcceptsJson();
+
+        $request = Craft::$app->getRequest();
+
+        $elementType = $request->getBodyParam('type', false);
+        $sourceKeyOrHandle = $request->getBodyParam('source', false);
+
+        $filters = false;
+        if($elementType && $sourceKeyOrHandle)
+        {
+            $filters = Searchit::$plugin->getElementFilters()->getElementFiltersForUse($elementType, $sourceKeyOrHandle);
+        }
+
+        return $this->asJson([ 'filters' => $filters ]);
+    }
+
     public function actionEdit(string $elementTypeHandle, string $sourceHandle, int $elementFilterId = null, ElementFilter $elementFilter = null): Response
     {
         $elementType = ElementHelper::getElementTypeByHandle($elementTypeHandle);
