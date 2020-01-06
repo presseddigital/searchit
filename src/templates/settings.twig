@@ -47,7 +47,7 @@
 
 			<div id="compactModePreviewOn" class="{{ settings.compactMode ? '' : 'hidden' }}">
 		        <div class="elementindex searchit--compactMode searchit--compactMode-on">
-			        {% include "_elements/indexcontainer" with {
+			        {% include "_elements/toolbar" with {
 			            showSiteMenu: false,
 			            elementType: 'craft\\elements\\Entry'
 			        } only %}
@@ -56,7 +56,7 @@
 
 			<div id="compactModePreviewOff" class="{{ settings.compactMode ? 'hidden' : '' }}">
 		        <div class="elementindex searchit--compactMode searchit--compactMode-off">
-			        {% include "_elements/indexcontainer" with {
+			        {% include "_elements/toolbar" with {
 			            showSiteMenu: false,
 			            elementType: 'craft\\elements\\Entry'
 			        } only %}
