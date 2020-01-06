@@ -120,7 +120,7 @@ var ElementFilters = (function() {
 			}
 
 			var xhr = new XMLHttpRequest();
-			xhr.open("POST", "/", true);
+			xhr.open("POST", Craft.baseCpUrl, true);
 			xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 			xhr.setRequestHeader("Accept", "application/json");
 
