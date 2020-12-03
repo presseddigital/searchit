@@ -1,29 +1,24 @@
 {
-    "name": "fruitstudios/searchit",
+    "name": "presseddigital/searchit",
     "description": "Configure powerful custom filters for an enhanced search experience in the Craft CMS control panel.",
     "type": "craft-plugin",
-    "version": "1.0.8",
+    "version": "1.0.9",
     "keywords": [
-        "craft",
-        "cms",
         "craftcms",
-        "craft-plugin",
         "searchit",
-        "cp-search",
-        "filters",
-        "search-filters",
         "search",
-        "elements"
+        "filters",
+        "search-filters"
     ],
     "support": {
-        "docs": "https://github.com/fruitstudios/craft-searchit/blob/master/README.md",
-        "issues": "https://github.com/fruitstudios/craft-searchit/issues"
+        "docs": "https://github.com/presseddigital/searchit/blob/master/README.md",
+        "issues": "https://github.com/presseddigital/searchit/issues"
     },
     "license": "proprietary",
     "authors": [
         {
-            "name": "Fruit Studios",
-            "homepage": "https://fruitstudios.co.uk"
+            "name": "Pressed Digital",
+            "homepage": "https://pressed.digital"
         }
     ],
     "require": {
@@ -31,7 +26,7 @@
     },
     "autoload": {
         "psr-4": {
-          "fruitstudios\\searchit\\": "src/"
+            "presseddigital\\searchit\\": "src/"
         }
     },
     "extra": {
@@ -39,7 +34,7 @@
         "handle": "searchit",
         "hasCpSettings": true,
         "hasCpSection": false,
-        "changelogUrl": "https://raw.githubusercontent.com/fruitstudios/craft-searchit/master/CHANGELOG.md",
-        "class": "fruitstudios\\searchit\\Searchit"
+        "changelogUrl": "https://raw.githubusercontent.com/presseddigital/searchit/master/CHANGELOG.md",
+        "class": "presseddigital\\searchit\\Searchit"
     }
 }

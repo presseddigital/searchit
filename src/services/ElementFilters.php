@@ -1,11 +1,11 @@
 <?php
-namespace fruitstudios\searchit\services;
+namespace presseddigital\searchit\services;
 
-use fruitstudios\searchit\Searchit;
-use fruitstudios\searchit\models\ElementFilter;
-use fruitstudios\searchit\models\SourceSettings;
-use fruitstudios\searchit\records\ElementFilter as ElementFilterRecord;
-use fruitstudios\searchit\helpers\ElementHelper;
+use presseddigital\searchit\Searchit;
+use presseddigital\searchit\models\ElementFilter;
+use presseddigital\searchit\models\SourceSettings;
+use presseddigital\searchit\records\ElementFilter as ElementFilterRecord;
+use presseddigital\searchit\helpers\ElementHelper;
 
 use Craft;
 use craft\base\Component;

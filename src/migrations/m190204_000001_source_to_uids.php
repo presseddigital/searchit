@@ -1,7 +1,7 @@
 <?php
-namespace fruitstudios\searchit\migrations;
+namespace presseddigital\searchit\migrations;
 
-use fruitstudios\searchit\Searchit;
+use presseddigital\searchit\Searchit;
 
 use Craft;
 use craft\db\Migration;

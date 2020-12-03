@@ -1,5 +1,5 @@
 <?php
-namespace fruitstudios\searchit\web\assets\searchit;
+namespace presseddigital\searchit\web\assets\searchit;
 
 use Craft;
 
@@ -13,7 +13,7 @@ class SearchitAssetBundle extends AssetBundle
 
     public function init()
     {
-        $this->sourcePath = "@fruitstudios/searchit/web/assets/searchit/build";
+        $this->sourcePath = "@presseddigital/searchit/web/assets/searchit/build";
 
         $this->depends = [];
 

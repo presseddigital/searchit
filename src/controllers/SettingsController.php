@@ -1,7 +1,7 @@
 <?php
-namespace fruitstudios\searchit\controllers;
+namespace presseddigital\searchit\controllers;
 
-use fruitstudios\searchit\Searchit;
+use presseddigital\searchit\Searchit;
 
 use Craft;
 use craft\web\Controller;

@@ -1,7 +1,7 @@
 <?php
-namespace fruitstudios\searchit\helpers;
+namespace presseddigital\searchit\helpers;
 
-use fruitstudios\searchit\Searchit;
+use presseddigital\searchit\Searchit;
 
 use Craft;
 use craft\elements\Entry;

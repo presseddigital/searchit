@@ -4,12 +4,12 @@
  *
  * A super simple field type which allows you toggle existing field types.
  *
- * @link      https://fruitstudios.co.uk
- * @copyright Copyright (c) 2018 Fruit Studios
+ * @link      https://pressed.digital
+ * @copyright Copyright (c) 2018 Pressed Digital
  */
 
 /**
- * @author    Fruit Studios
+ * @author    Pressed Digital
  * @package   Searchit
  * @since     1.0.0
  */

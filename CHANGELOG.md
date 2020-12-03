@@ -1,6 +1,12 @@
 # Searchit Changelog
 > Configure powerful custom filters for an enhanced search experience in the Craft CMS control panel for [Craft 3](http://craftcms.com)
 
+## 1.0.9 - 2020-11-15
+
+### Changed
+
+*   Transfer ownership to Pressed Digital
+
 ## 1.0.8 - 2019-05-16
 
 ### Fixed

@@ -1,5 +1,5 @@
 <?php
-namespace fruitstudios\searchit\records;
+namespace presseddigital\searchit\records;
 
 use craft\db\ActiveRecord;
 use yii\db\ActiveQueryInterface;

@@ -1,7 +1,7 @@
 <?php
-namespace fruitstudios\searchit\web\twig;
+namespace presseddigital\searchit\web\twig;
 
-use fruitstudios\searchit\Searchit;
+use presseddigital\searchit\Searchit;
 
 use Craft;
 use yii\base\Behavior;

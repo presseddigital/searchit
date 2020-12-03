@@ -4,17 +4,17 @@
  *
  * A super simple field type which allows you toggle existing field types.
  *
- * @link      https://fruitstudios.co.uk
- * @copyright Copyright (c) 2018 Fruit Studios
+ * @link      https://pressed.digital
+ * @copyright Copyright (c) 2018 Pressed Digital
  */
 
-namespace fruitstudios\searchit;
+namespace presseddigital\searchit;
 
-use fruitstudios\searchit\models\Settings;
-use fruitstudios\searchit\plugin\Routes as SearchitRoutes;
-use fruitstudios\searchit\plugin\Services as SearchitServices;
-use fruitstudios\searchit\web\twig\CraftVariableBehavior;
-use fruitstudios\searchit\web\assets\searchit\SearchitAssetBundle;
+use presseddigital\searchit\models\Settings;
+use presseddigital\searchit\plugin\Routes as SearchitRoutes;
+use presseddigital\searchit\plugin\Services as SearchitServices;
+use presseddigital\searchit\web\twig\CraftVariableBehavior;
+use presseddigital\searchit\web\assets\searchit\SearchitAssetBundle;
 
 use Craft;
 use craft\base\Plugin;
@@ -36,7 +36,7 @@ use yii\base\Event;
 /**
  * Class Searchit
  *
- * @author    Fruit Studios
+ * @author    Pressed Digital
  * @package   Searchit
  * @since     1.0.0
  *

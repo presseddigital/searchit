@@ -1,9 +1,11 @@
 
-<p align="left"><a href="https://github.com/fruitstudios/craft-searchit" target="_blank"><img width="100" height="100" src="resources/img/searchit.svg" alt="Searchit"></a></p>
+<p align="left"><a href="https://github.com/presseddigital/searchit" target="_blank"><img width="100" height="100" src="resources/img/searchit.svg" alt="Searchit"></a></p>
 
 # Searchit plugin for Craft CMS 3
 
 Configure powerful custom filters for an enhanced search experience in the Craft CMS control panel. Harness the power of twig and element queries to create endless filtering options. Keep your clients happy!
+
+> :mega: **A note from the new (well sort of new) owners Pressed Digital:** At the end of 2019 Pressed Digital Ltd was sold to allow it's founders to shift 100% of their focus to the, now not so side project, findarace.com. As a part of the deal we retained ownership of all Craft plugins and are committed to make them even more awesome. With findarace.com being all Craft, this aligns really nicely, and as a little silver lining we should now finally have some time to launch some of our unreleased plugins!
 
 See it in action...
 
@@ -25,7 +27,7 @@ Open terminal, go to your Craft project folder and use composer to load this plu
 
 ```bash
 cd /path/to/project
-composer require fruitstudios/searchit
+composer require presseddigital/searchit
 ```
 
 ## Creating a filter
@@ -154,4 +156,4 @@ Craft CMS Search Documentation [Docs](https://docs.craftcms.com/v3/searching.htm
 As with the regular Craft Search, if you suspect that your search indexes don’t have the latest and greatest data, you can have Craft rebuild them with the Rebuild Search Indexes tool in Settings. [Docs](https://docs.craftcms.com/v3/searching.html#rebuilding-your-search-indexes)
 
 
-Brought to you by [FRUIT](https://fruitstudios.co.uk)
+Brought to you by [Pressed Digital](https://pressed.digital)

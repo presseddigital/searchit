@@ -1,7 +1,7 @@
 <?php
-namespace fruitstudios\searchit\web\twig;
+namespace presseddigital\searchit\web\twig;
 
-use fruitstudios\searchit\Plugin;
+use presseddigital\searchit\Plugin;
 
 use Craft;
 

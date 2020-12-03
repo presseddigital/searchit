@@ -1,5 +1,5 @@
 <?php
-namespace fruitstudios\searchit\plugin;
+namespace presseddigital\searchit\plugin;
 
 use craft\events\RegisterUrlRulesEvent;
 use craft\web\UrlManager;

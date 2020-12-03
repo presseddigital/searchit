@@ -1,9 +1,9 @@
 <?php
-namespace fruitstudios\searchit\plugin;
+namespace presseddigital\searchit\plugin;
 
 use Craft;
-use fruitstudios\searchit\services\Cp;
-use fruitstudios\searchit\services\ElementFilters;
+use presseddigital\searchit\services\Cp;
+use presseddigital\searchit\services\ElementFilters;
 
 trait Services
 {

@@ -1,7 +1,7 @@
 <?php
-namespace fruitstudios\searchit\models;
+namespace presseddigital\searchit\models;
 
-use fruitstudios\searchit\Searchit;
+use presseddigital\searchit\Searchit;
 
 use Craft;
 use craft\base\Model;

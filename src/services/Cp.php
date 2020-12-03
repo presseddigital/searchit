@@ -1,7 +1,7 @@
 <?php
-namespace fruitstudios\searchit\services;
+namespace presseddigital\searchit\services;
 
-use fruitstudios\searchit\Searchit;
+use presseddigital\searchit\Searchit;
 
 use Craft;
 use craft\base\Component;

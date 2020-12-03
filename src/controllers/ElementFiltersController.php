@@ -1,10 +1,10 @@
 <?php
-namespace fruitstudios\searchit\controllers;
+namespace presseddigital\searchit\controllers;
 
-use fruitstudios\searchit\Searchit;
-use fruitstudios\searchit\helpers\ElementHelper;
-use fruitstudios\searchit\models\ElementFilter;
-use fruitstudios\searchit\models\SourceSettings;
+use presseddigital\searchit\Searchit;
+use presseddigital\searchit\helpers\ElementHelper;
+use presseddigital\searchit\models\ElementFilter;
+use presseddigital\searchit\models\SourceSettings;
 
 use Craft;
 use craft\web\Controller;
