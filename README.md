@@ -1,7 +1,7 @@
 
-<p align="left"><a href="https://github.com/fruitstudios/craft-searchit" target="_blank"><img width="100" height="100" src="resources/img/searchit.svg" alt="Searchit"></a></p>
+<p align="left"><a href="https://github.com/presseddigital/searchit" target="_blank"><img width="100" height="100" src="resources/img/searchit.svg" alt="Searchit"></a></p>
 
-# Searchit plugin for Craft CMS 3
+# Searchit plugin for Craft CMS 4.x
 
 Configure powerful custom filters for an enhanced search experience in the Craft CMS control panel. Harness the power of twig and element queries to create endless filtering options. Keep your clients happy!
 
@@ -11,7 +11,7 @@ See it in action...
 
 ## Requirements
 
-This plugin requires Craft CMS 3.1.2 or later.
+This plugin requires Craft CMS 4.0.0 or later.
 
 ## Installation
 
@@ -151,7 +151,7 @@ Support for Commerce coming very soon
 #### Useful Resources
 Craft CMS Search Documentation [Docs](https://docs.craftcms.com/v3/searching.html)
 
-As with the regular Craft Search, if you suspect that your search indexes don’t have the latest and greatest data, you can have Craft rebuild them with the Rebuild Search Indexes tool in Settings. [Docs](https://docs.craftcms.com/v3/searching.html#rebuilding-your-search-indexes)
+As with the regular Craft Search, if you suspect that your search indexes don’t have the latest and greatest data, you can have Craft rebuild them with the Rebuild Search Indexes tool in Settings. [Docs](https://craftcms.com/docs/4.x/searching.html#rebuilding-your-search-indexes)
 
 
 Brought to you by [FRUIT](https://fruitstudios.co.uk)

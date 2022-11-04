@@ -20,6 +20,7 @@ use craft\elements\Asset;
 use craft\commerce\elements\Product;
 
 use craft\commerce\Plugin as CommercePlugin;
+use Exception;
 
 class ElementFilters extends Component
 {
@@ -132,7 +133,7 @@ class ElementFilters extends Component
             'handle' => self::GLOBAL_SOURCE_HANDLE,
         ];
 
-        $allSources = Craft::$app->getElementIndexes()->getSources($elementType);
+        $allSources = Craft::$app->getElementSources()->getSources($elementType);
         if($allSources)
         {
             foreach ($allSources as $source)

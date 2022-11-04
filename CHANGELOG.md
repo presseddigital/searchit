@@ -1,5 +1,11 @@
 # Searchit Changelog
-> Configure powerful custom filters for an enhanced search experience in the Craft CMS control panel for [Craft 3](http://craftcms.com)
+> Configure powerful custom filters for an enhanced search experience in the Craft CMS control panel for [Craft 4](http://craftcms.com)
+
+## 2.0.0 - 2022-11-04
+
+### Added
+
+*   Added - CraftCMS ^4.0.0 compatibility.
 
 ## 1.0.8 - 2019-05-16
 

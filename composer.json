@@ -2,7 +2,6 @@
     "name": "fruitstudios/searchit",
     "description": "Configure powerful custom filters for an enhanced search experience in the Craft CMS control panel.",
     "type": "craft-plugin",
-    "version": "1.0.8",
     "keywords": [
         "craft",
         "cms",
@@ -16,8 +15,8 @@
         "elements"
     ],
     "support": {
-        "docs": "https://github.com/fruitstudios/craft-searchit/blob/master/README.md",
-        "issues": "https://github.com/fruitstudios/craft-searchit/issues"
+        "docs": "https://github.com/presseddigital/searchit/blob/master/README.md",
+        "issues": "https://github.com/presseddigital/searchit/issues"
     },
     "license": "proprietary",
     "authors": [
@@ -27,7 +26,7 @@
         }
     ],
     "require": {
-        "craftcms/cms": "^3.1.2"
+        "craftcms/cms": "^4.0.0"
     },
     "autoload": {
         "psr-4": {
@@ -39,7 +38,7 @@
         "handle": "searchit",
         "hasCpSettings": true,
         "hasCpSection": false,
-        "changelogUrl": "https://raw.githubusercontent.com/fruitstudios/craft-searchit/master/CHANGELOG.md",
+        "changelogUrl": "https://raw.githubusercontent.com/presseddigital/searchit/master/CHANGELOG.md",
         "class": "fruitstudios\\searchit\\Searchit"
     }
 }

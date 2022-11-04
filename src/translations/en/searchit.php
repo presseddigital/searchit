@@ -1,6 +1,6 @@
 <?php
 /**
- * Searchit plugin for Craft CMS 3.x
+ * Searchit plugin for Craft CMS 4.x
  *
  * A super simple field type which allows you toggle existing field types.
  *

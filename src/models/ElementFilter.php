@@ -37,6 +37,7 @@ class ElementFilter extends Model
 
     public function validateSettings()
     {
+        /** @var craft\web\View $view */
         $view = Craft::$app->getView();
         $currentTemplateMode = $view->getTemplateMode();
         $view->setTemplateMode($view::TEMPLATE_MODE_SITE);
@@ -167,6 +168,7 @@ class ElementFilter extends Model
                 break;
 
             case 'dynamic':
+                /** @var craft\web\View $view */
                 $view = Craft::$app->getView();
                 $currentTemplateMode = $view->getTemplateMode();
                 $view->setTemplateMode($view::TEMPLATE_MODE_SITE);
@@ -191,12 +193,10 @@ class ElementFilter extends Model
 
     public function getPreview()
     {
-        return Craft::$app->getView()->renderTemplateMacro('_includes/forms', 'select', [
+        return Craft::$app->getView()->renderObjectTemplate('_includes/forms', 'select', [
             [
                 'options' => $this->getOptions(),
             ]
         ]);
     }
-
-
 }
