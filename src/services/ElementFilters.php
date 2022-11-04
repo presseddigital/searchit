@@ -20,6 +20,7 @@ use craft\elements\Asset;
 use craft\commerce\elements\Product;
 
 use craft\commerce\Plugin as CommercePlugin;
+use Exception;
 
 class ElementFilters extends Component
 {
