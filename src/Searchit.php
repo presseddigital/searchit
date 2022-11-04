@@ -1,6 +1,6 @@
 <?php
 /**
- * Searchit plugin for Craft CMS 3.x
+ * Searchit plugin for Craft CMS 4.x
  *
  * A super simple field type which allows you toggle existing field types.
  *
@@ -55,7 +55,7 @@ class Searchit extends Plugin
     // Public Properties
     // =========================================================================
 
-    public $schemaVersion = '1.0.4';
+    public string $schemaVersion = '1.0.4';
 
     // Traits
     // =========================================================================
@@ -102,11 +102,6 @@ class Searchit extends Plugin
         Craft::info(Craft::t('searchit', '{name} plugin loaded', ['name' => $this->name]), __METHOD__);
     }
 
-    public function beforeInstall(): bool
-    {
-        return true;
-    }
-
     public function afterInstallPlugin(PluginEvent $event)
     {
         $isCpRequest = Craft::$app->getRequest()->isCpRequest;
@@ -116,7 +111,7 @@ class Searchit extends Plugin
         }
     }
 
-    public function getSettingsResponse()
+    public function getSettingsResponse(): mixed
     {
         return Craft::$app->controller->redirect(UrlHelper::cpUrl('searchit/settings'));
     }
@@ -190,7 +185,7 @@ class Searchit extends Plugin
     // Protected Methods
     // =========================================================================
 
-    protected function createSettingsModel()
+    protected function createSettingsModel(): ?craft\base\Model
     {
         return new Settings();
     }

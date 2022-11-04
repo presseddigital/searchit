@@ -132,7 +132,7 @@ class ElementFilters extends Component
             'handle' => self::GLOBAL_SOURCE_HANDLE,
         ];
 
-        $allSources = Craft::$app->getElementIndexes()->getSources($elementType);
+        $allSources = Craft::$app->getElementSources()->getSources($elementType);
         if($allSources)
         {
             foreach ($allSources as $source)
